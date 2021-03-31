@@ -32,6 +32,22 @@ struct GeoVec{
 
 };
 
+GeoVec operator/(const GeoVec& lhs, double rhs){
+    return {lhs.x_/rhs, lhs.y_/rhs, lhs.z_/rhs};
+}
+
+GeoVec operator*(const GeoVec& lhs, double rhs){
+    return {lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs};
+}
+
+GeoVec operator+(const GeoVec& lhs, const GeoVec& rhs){
+    return {lhs.x_+rhs.x_, lhs.y_+rhs.y_, lhs.z_+rhs.z_};
+}
+
+GeoVec operator-(const GeoVec& lhs, const GeoVec& rhs){
+    return {lhs.x_-rhs.x_, lhs.y_-rhs.y_, lhs.z_-rhs.z_};
+}
+
 
 
 #endif 	//GEO_VEC_H
