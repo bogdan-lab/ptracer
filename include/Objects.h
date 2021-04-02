@@ -4,6 +4,8 @@
 #include "GeoVec.h"
 #include "Ray.h"
 
+#include <optional>
+
 struct Color {
     double red_;
     double green_;
@@ -16,7 +18,7 @@ struct Object {
     double emission_;
     //int type
 
-    virtual double GetDistanceToObj(const Ray& ray) const = 0;
+    virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
     virtual GeoVec GetNorm(const GeoVec& p) const = 0;
     virtual ~Object() = default;
 };
@@ -29,7 +31,7 @@ public:
     Sphere() = delete;
     Sphere(const GeoVec& gc, double gr) : center_(gc), r_(gr) {}
 
-    double GetDistanceToObj(const Ray &ray) const override;
+    std::optional<double> GetClosesDist(const Ray &ray) const override;
 
     GeoVec GetNorm(const GeoVec& p) const override {
         return (p - center_)/r_;

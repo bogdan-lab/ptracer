@@ -9,6 +9,11 @@ struct GeoVec{
 
     GeoVec() = delete;
     GeoVec(double x, double y, double z): x_(x), y_(y), z_(z) {}
+    GeoVec(const GeoVec& start, const GeoVec& end) {
+        x_ = end.x_ - start.x_;
+        y_ = end.y_ - start.y_;
+        z_ = end.z_ - start.z_;
+    }
 
     double Len() const {return std::sqrt(x_*x_ + y_*y_ + z_*z_);}
 
@@ -32,19 +37,19 @@ struct GeoVec{
 
 };
 
-GeoVec operator/(const GeoVec& lhs, double rhs){
+inline GeoVec operator/(const GeoVec& lhs, double rhs){
     return {lhs.x_/rhs, lhs.y_/rhs, lhs.z_/rhs};
 }
 
-GeoVec operator*(const GeoVec& lhs, double rhs){
+inline GeoVec operator*(const GeoVec& lhs, double rhs){
     return {lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs};
 }
 
-GeoVec operator+(const GeoVec& lhs, const GeoVec& rhs){
+inline GeoVec operator+(const GeoVec& lhs, const GeoVec& rhs){
     return {lhs.x_+rhs.x_, lhs.y_+rhs.y_, lhs.z_+rhs.z_};
 }
 
-GeoVec operator-(const GeoVec& lhs, const GeoVec& rhs){
+inline GeoVec operator-(const GeoVec& lhs, const GeoVec& rhs){
     return {lhs.x_-rhs.x_, lhs.y_-rhs.y_, lhs.z_-rhs.z_};
 }
 
