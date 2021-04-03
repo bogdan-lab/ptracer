@@ -3,40 +3,23 @@
 
 #include "GeoVec.h"
 #include "Ray.h"
+#include "Color.h"
 
 #include <optional>
-#include <algorithm>
-#include <iostream>
 
-struct Color {
-    static const uint8_t MAX_COLOR_VALUE = 255u;
-    uint8_t red_{0};
-    uint8_t green_{0};
-    uint8_t blue_{0};
 
-    Color() = default;
-
-    Color(uint32_t R, uint32_t G, uint32_t B) {
-        red_ = std::clamp(R, 0u, static_cast<uint32_t>(MAX_COLOR_VALUE));
-        green_ = std::clamp(G, 0u, static_cast<uint32_t>(MAX_COLOR_VALUE));
-        blue_ = std::clamp(B, 0u, static_cast<uint32_t>(MAX_COLOR_VALUE));
-    }
-
+enum class Material {
+    kCommon,
+    kLightSource,
+    kMirror
 };
 
-inline std::ostream& operator<<(std::ostream& out, uint8_t val) {
-    return out << static_cast<uint32_t>(val);
-}
-
-inline std::ostream& operator << (std::ostream& out, const Color& c) {
-    return out << c.red_ << ' ' << c.green_ << ' ' << c.blue_;
-}
 
 
 class Object {
 private:
     Color color_;
-    double emission_{0.0};
+    Material mat_;
 public:
 
     Object& SetColor(const Color& col) {
@@ -44,16 +27,17 @@ public:
         return *this;
     }
 
-    Object& SetEmission(double g_emit) {
-        emission_ = g_emit;
+    Object& SetMaterial(Material g_mat) {
+        mat_ = g_mat;
         return *this;
     }
 
     const Color& GetColor() const {return color_;}
-    double GetEmission() const {return emission_;}
+    Material GetMaterial() const {return mat_;}
 
     virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
     virtual GeoVec GetNorm(const GeoVec& p) const = 0;
+    virtual Ray Reflect(const Ray& ray_in, double dist) const = 0;
     virtual ~Object() = default;
 };
 
@@ -71,7 +55,17 @@ public:
         return (p - center_)/r_;
     }
 
+    Ray Reflect(const Ray &ray_in, double dist) const override {
+        std::cout << "REFLECTION NOT YET IMPLEMENTED!!!!\n";
+        exit(1);
+    }
 };
+
+
+
+
+
+
 
 
 #endif //OBJECTS_H

@@ -3,6 +3,7 @@
 
 #include "GeoVec.h"
 #include "Ray.h"
+#include "Pixel.h"
 
 #include <cstdlib>
 #include <random>
