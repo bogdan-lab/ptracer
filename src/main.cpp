@@ -18,11 +18,11 @@ int main(){
     std::vector<Ray> cam_rays = cam.GetCameraRayGrid();
 
     Scene universe;
-    ObjHolder source = std::make_unique<Sphere>({{100,100,100}, 100});
+    ObjHolder source = std::make_unique<Sphere>(GeoVec{100,100,100}, 100.0);
     source->SetMaterial(Material::kLightSource);
     universe.AddObject(std::move(source));
 
-    ObjHolder sphere  = std::make_unique<Sphere>({{300, 100, 100}, 100});
+    ObjHolder sphere  = std::make_unique<Sphere>(GeoVec{300, 100, 100}, 100.0);
     sphere->SetColor({255, 129, 63}).SetMaterial(Material::kCommon);
     universe.AddObject(std::move(sphere));
 
@@ -30,19 +30,19 @@ int main(){
 
 
 
-
+    /*
     std::ofstream image("test.ppm");
     image << "P3\n";
     image << cam.GetWidth() << ' ' << cam.GetHeight() << '\n';
     image << Color::MAX_COLOR_VALUE << '\n';
     for (size_t i=0; i<cam_rays.size(); i++) {
-        if(sphere.GetClosesDist(cam_rays[i])) {
+        if(sphere.GetClosestDist(cam_rays[i])) {
             image << sphere.GetColor() << '\n';
         }
         else {
             image << Color{} << '\n';
         }
     }
-
+    */
     return 0;
 }
