@@ -14,7 +14,7 @@
 
 int main(){
 
-    Camera cam;
+    Camera cam(42u);
     std::vector<Ray> cam_rays = cam.GetCameraRayGrid();
 
     Scene universe;

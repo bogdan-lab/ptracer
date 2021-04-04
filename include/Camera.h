@@ -11,6 +11,8 @@
 
 class Camera {
 private:
+    //TODO change width_ and height_ to double ->
+    //less static_casts + smoothing for pixel by some characteristic radius
     size_t width_{600};
     size_t height_{400};
     double dist_to_plane_{500};
@@ -19,20 +21,30 @@ private:
     GeoVec pos_;
 
     Ray CreateRay(size_t x_coor, size_t y_coor) const {
-        GeoVec dir = {x_coor - pos_.x_, y_coor - pos_.y_, dist_to_plane_};
+        GeoVec dir = {static_cast<double>(x_coor) - pos_.x_,
+                      static_cast<double>(y_coor) - pos_.y_,
+                      dist_to_plane_};
         return {pos_, dir};
     }
 
 public:
-    Camera() : rnd_(42), pos_(width_/2, height_/2, -dist_to_plane_) {}
+    Camera() = delete;
 
-    explicit Camera(size_t seed) : rnd_(seed), pos_(width_/2, height_/2, -dist_to_plane_)  {}
+    explicit Camera(size_t seed) : rnd_(seed),
+        pos_(static_cast<double>(width_/2),
+             static_cast<double>(height_/2),
+             -dist_to_plane_)
+    {}
 
-    Ray GetCameraRay() {
+    //TODO Do I need this kind of  ray generator?
+    //Pixel will have its coordinates (+produce coordinates around for smoothing)
+    //after that for generating ray I need only camera position.
+    //CAMERA SHOULD GENERATE PIXELS -> it knows its position and it knows picture size!
+    /*Ray GetCameraRay() {
         double x_rnd = distrib_(rnd_);
         double y_rnd = distrib_(rnd_);
-        return CreateRay(x_rnd*width_, y_rnd*height_);
-    }
+        return CreateRay(x_rnd*static_cast<double>(width_), y_rnd*static_cast<double>(height_));
+    }*/
 
     std::vector<Ray> GetCameraRayGrid() const {
         std::vector<Ray> all_rays;

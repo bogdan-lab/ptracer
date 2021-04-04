@@ -3,10 +3,9 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <algorithm>
+#include <limits>
 
 struct Color {
-    static const uint8_t MAX_COLOR_VALUE = 255u;
     uint8_t red_{0};
     uint8_t green_{0};
     uint8_t blue_{0};
@@ -14,9 +13,15 @@ struct Color {
     Color() = default;
 
     Color(uint32_t R, uint32_t G, uint32_t B) {
-        red_ = std::clamp(R, 0u, static_cast<uint32_t>(MAX_COLOR_VALUE));
-        green_ = std::clamp(G, 0u, static_cast<uint32_t>(MAX_COLOR_VALUE));
-        blue_ = std::clamp(B, 0u, static_cast<uint32_t>(MAX_COLOR_VALUE));
+        red_ = ColorClamp(R);
+        green_ = ColorClamp(G);
+        blue_ = ColorClamp(B);
+    }
+
+    uint8_t ColorClamp(uint32_t val) {
+        auto high = std::numeric_limits<uint8_t>::max();
+        auto low = std::numeric_limits<uint8_t>::min();
+        return static_cast<uint8_t>(val>=high ? high : (val<=low ? low : val));
     }
 
 };
