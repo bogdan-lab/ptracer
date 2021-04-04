@@ -11,6 +11,17 @@
 #include <vector>
 #include <optional>
 
+enum class BounceHitInfo {
+    kHitSource,
+    kHitNothing,
+    kHitObject
+};
+
+struct BounceRecord {
+    BounceHitInfo hit_info_;
+    std::optional<Color> hit_obj_color_;
+};
+
 
 class Renderer {
 private:
@@ -26,7 +37,7 @@ public:
 
     Color RenderRay(const Ray& ray, const Scene& universe);
 
-    std::optional<Color> MakeRayBounce(Ray& ray, const ObjectCollection& all_objects);
+    BounceRecord MakeRayBounce(Ray& ray, const ObjectCollection& all_objects);
 
     Color GetAverageColor() const;
 

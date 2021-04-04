@@ -3,6 +3,7 @@
 #include "Color.h"
 
 #include <optional>
+#include <limits>
 
 size_t Renderer::BOUNCE_LIMIT = 10;
 
@@ -11,33 +12,56 @@ Color Renderer::RenderRay(const Ray &ray, const Scene &universe) {
     bounce_colors_.reserve(BOUNCE_LIMIT);
     size_t curr_bounces = 0;
     Ray curr_ray = ray;
-    std::optional<Color> curr_color = std::nullopt;
     const auto& all_objects = universe.GetObjects();
-    while (curr_bounces < BOUNCE_LIMIT) {
+    while (curr_bounces < BOUNCE_LIMIT-1) {
+        //should take into account al trace if eventually it heats light source!
+        //so check that last hit separately
         curr_bounces++;
-        curr_color = MakeRayBounce(curr_ray, all_objects);
-        if(!curr_color) {
-            return Color{0,0,0};
+        BounceRecord bc_rec = MakeRayBounce(curr_ray, all_objects);
+        switch (bc_rec.hit_info_) {
+        case BounceHitInfo::kHitNothing:
+            return Color{0,0,0}; 	 	 	 	//TODO Maybe set it somewhere as "shade color"? or "backgrounde color"
+        case BounceHitInfo::kHitSource:
+            bounce_colors_.push_back(*bc_rec.hit_obj_color_);
+            return GetAverageColor();
+        case BounceHitInfo::kHitObject:
+            bounce_colors_.push_back(*bc_rec.hit_obj_color_);
+            break;
+        default:
+            exit(1);
         }
-        bounce_colors_.push_back(*curr_color);
     }
+    BounceRecord bc_rec = MakeRayBounce(curr_ray, all_objects);
+    if(BounceHitInfo::kHitSource != bc_rec.hit_info_) {
+        return Color{0,0,0};
+    }
+    bounce_colors_.push_back(*bc_rec.hit_obj_color_);
     return GetAverageColor();
 
 }
 
 
-std::optional<Color> Renderer::MakeRayBounce(Ray &ray, const ObjectCollection &all_objects) {
+BounceRecord Renderer::MakeRayBounce(Ray &ray, const ObjectCollection &all_objects) {
     std::optional<double> dist = std::nullopt;
-    for (const auto& el : all_objects) {
-        dist = el->GetClosesDist(ray);
-        if(dist) {
-            //reflect and return obtained color
-            ray = el->Reflect(ray, *dist);
-            return el->GetColor();
+    size_t obj_idx = 0;
+    double min_dist = std::numeric_limits<double>::max();
+    for (size_t i=0; i<all_objects.size(); i++) {
+        dist = all_objects[i]->GetClosesDist(ray);
+        if(dist && min_dist<*dist) {
+            min_dist = *dist;
+            obj_idx = i;
         }
     }
-    //ray has not meet any object
-    return std::nullopt;
+    if(min_dist == std::numeric_limits<double>::max()) {
+        //hit nothing
+        return {BounceHitInfo::kHitNothing, std::nullopt};
+    }
+    const auto& obj_color = all_objects[obj_idx]->GetColor();
+    if (all_objects[obj_idx]->GetMaterial()==Material::kLightSource) {
+        return {BounceHitInfo::kHitSource, obj_color};
+    }
+    all_objects[obj_idx]->Reflect(ray, min_dist);
+    return {BounceHitInfo::kHitObject, obj_color};
 }
 
 
@@ -51,6 +75,6 @@ Color Renderer::GetAverageColor() const {
         g += el.green_;
         b += el.blue_;
     }
-    const size_t b_num = bounce_colors_.size();
+    const uint32_t b_num = static_cast<uint32_t>(bounce_colors_.size());
     return {r/b_num, g/b_num, b/b_num};
 }
