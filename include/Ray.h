@@ -15,6 +15,10 @@ struct Ray{
     Ray(GeoVec&& pos, GeoVec&& dir) : pos_(std::move(pos)),
         dir_(std::move(dir.Norm())) {} 	 	//TODO check if here we will still get move!
 
+    Ray& Advance(double dist) {
+        pos_ = pos_ + dist*dir_;
+        return *this;
+    }
 };
 
 

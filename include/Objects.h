@@ -37,7 +37,7 @@ public:
 
     virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
     virtual GeoVec GetNorm(const GeoVec& p) const = 0;
-    virtual Ray Reflect(const Ray& ray_in, double dist) const = 0;
+    virtual void Reflect(Ray& ray_in, double dist) const = 0;
     virtual ~Object() = default;
 };
 
@@ -55,9 +55,10 @@ public:
         return (p - center_)/r_;
     }
 
-    Ray Reflect(const Ray &ray_in, double dist) const override {
-        std::cout << "REFLECTION NOT YET IMPLEMENTED!!!!\n";
-        exit(1);
+    void Reflect(Ray &ray_in, double dist) const override {
+        ray_in.Advance(dist);
+        GeoVec norm = GetNorm(ray_in.pos_);
+        ray_in.dir_ = ray_in.dir_ + 2*ray_in.dir_.Dot(norm)*norm;
     }
 };
 

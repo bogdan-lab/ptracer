@@ -12,6 +12,7 @@
 #include <optional>
 
 enum class BounceHitInfo {
+    kUndefined = 0,
     kHitSource,
     kHitNothing,
     kHitObject
@@ -34,12 +35,12 @@ public:
     explicit Renderer(size_t seed) : rnd_(seed) {}
 
     static void SetBounceLimit(size_t g_num) {BOUNCE_LIMIT = g_num;}
+    static Color GetAverageColor(const std::vector<Color> colors);
 
     Color RenderRay(const Ray& ray, const Scene& universe);
 
     BounceRecord MakeRayBounce(Ray& ray, const ObjectCollection& all_objects);
 
-    Color GetAverageColor() const;
 
 };
 

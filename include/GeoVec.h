@@ -45,6 +45,10 @@ inline GeoVec operator*(const GeoVec& lhs, double rhs){
     return {lhs.x_*rhs, lhs.y_*rhs, lhs.z_*rhs};
 }
 
+inline GeoVec operator*(double lhs, const GeoVec& rhs) {
+    return rhs*lhs;
+}
+
 inline GeoVec operator+(const GeoVec& lhs, const GeoVec& rhs){
     return {lhs.x_+rhs.x_, lhs.y_+rhs.y_, lhs.z_+rhs.z_};
 }

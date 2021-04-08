@@ -14,8 +14,6 @@
 
 int main(){
 
-    Camera cam(42u);
-    std::vector<Ray> cam_rays = cam.GetCameraRayGrid();
 
     Scene universe;
     ObjHolder source = std::make_unique<Sphere>(GeoVec{100,100,100}, 100.0);
@@ -26,23 +24,20 @@ int main(){
     sphere->SetColor({255, 129, 63}).SetMaterial(Material::kCommon);
     universe.AddObject(std::move(sphere));
 
-    const auto& all_objects = universe.GetObjects();
+    Camera cam{600, 400, 500};
+    std::vector<Pixel> all_pixels = cam.MakeAllPixels();
 
+    for(size_t i=0; i<all_pixels.size(); i++) {
+        all_pixels[i].TracePixel(universe, i);
+    }
 
-
-    /*
     std::ofstream image("test.ppm");
     image << "P3\n";
     image << cam.GetWidth() << ' ' << cam.GetHeight() << '\n';
-    image << Color::MAX_COLOR_VALUE << '\n';
-    for (size_t i=0; i<cam_rays.size(); i++) {
-        if(sphere.GetClosestDist(cam_rays[i])) {
-            image << sphere.GetColor() << '\n';
-        }
-        else {
-            image << Color{} << '\n';
-        }
+    image << 255 << '\n';
+    for(const auto& px : all_pixels) {
+        image << px.GetPixelColor() << '\n';
     }
-    */
+
     return 0;
 }
