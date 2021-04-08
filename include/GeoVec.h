@@ -2,7 +2,7 @@
 #define GEO_VEC_H
 
 #include<cmath>
-
+#include<assert.h>
 
 struct GeoVec{
     double x_, y_, z_;
@@ -19,6 +19,7 @@ struct GeoVec{
 
     GeoVec& Norm() {
         double l = Len();
+        assert(l!=0);
         x_ /= l;
         y_ /= l;
         z_ /= l;
@@ -57,6 +58,12 @@ inline GeoVec operator-(const GeoVec& lhs, const GeoVec& rhs){
     return {lhs.x_-rhs.x_, lhs.y_-rhs.y_, lhs.z_-rhs.z_};
 }
 
+inline bool operator==(const GeoVec& lhs, const GeoVec& rhs) {
+    return lhs.x_ == rhs.x_ && lhs.y_ == rhs.y_ && lhs.z_ == rhs.z_;
+}
 
+inline GeoVec operator-(const GeoVec& v){
+    return {-v.x_, -v.y_, -v.z_};
+}
 
 #endif 	//GEO_VEC_H
