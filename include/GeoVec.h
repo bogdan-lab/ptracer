@@ -39,6 +39,7 @@ struct GeoVec{
 };
 
 inline GeoVec operator/(const GeoVec& lhs, double rhs){
+    assert(rhs!=0);
     return {lhs.x_/rhs, lhs.y_/rhs, lhs.z_/rhs};
 }
 

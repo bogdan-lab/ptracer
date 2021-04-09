@@ -84,5 +84,27 @@ TEST(GeoVecTests, Cross) {
     EXPECT_EQ(p1.Cross(zero), zero);
 }
 
+TEST(GeoVecTests, Operators) {
+    GeoVec x0{1,-2,M_PI};
+    GeoVec x1{6.0, 9.0, -3*M_PI};
 
+    GeoVec res1{2.0, 3.0, -M_PI};
+    EXPECT_EQ(x1/3, res1);
+
+    EXPECT_DEATH(x1/0, "");
+
+    GeoVec res2{12.0, 18.0, -6*M_PI};
+    EXPECT_EQ(res2, x1*2);
+    EXPECT_EQ(res2, 2*x1);
+
+    GeoVec res3{7.0, 7.0, -2*M_PI};
+    EXPECT_EQ(res3, x1+x0);
+    EXPECT_EQ(res3, x0+x1);
+
+    GeoVec res4{5.0, 11.0, -4*M_PI};
+    EXPECT_EQ(res4, x1-x0);
+    EXPECT_EQ(res4, -x0+x1);
+
+
+}
 
