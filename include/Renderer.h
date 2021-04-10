@@ -27,12 +27,11 @@ struct BounceRecord {
 class Renderer {
 private:
     static size_t BOUNCE_LIMIT;
-    std::mt19937 rnd_;
     std::vector<Color> bounce_colors_;
 
 public:
 
-    explicit Renderer(size_t seed) : rnd_(seed) {}
+    Renderer() = default;
 
     static void SetBounceLimit(size_t g_num) {BOUNCE_LIMIT = g_num;}
     static Color GetAverageColor(const std::vector<Color> colors);

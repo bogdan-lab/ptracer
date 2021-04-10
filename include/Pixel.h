@@ -8,21 +8,24 @@
 
 #include <cstdlib>
 #include <vector>
+#include <random>
 
 
 class Pixel {
 private:
-    static size_t SAMPLE_NUM;
-    Ray ray_;
+    std::vector<Ray> in_rays_;
     Color color_;
 public:
     Pixel() = delete;
 
-    explicit Pixel(const Ray& r) : ray_(r), color_(0,0,0) {}
+    explicit Pixel(const std::vector<Ray>& rays)
+        : in_rays_(rays), color_(0,0,0) {}
 
-    static void SetSampleNum(size_t g_num) {SAMPLE_NUM = g_num;}
+    explicit Pixel(std::vector<Ray>&& rays)
+        : in_rays_(std::move(rays)), color_(0,0,0) {}
 
-    void TracePixel(const Scene& universe, size_t seed);
+
+    void TracePixel(const Scene& universe);
 
     const Color& GetPixelColor() const {return color_;}
 

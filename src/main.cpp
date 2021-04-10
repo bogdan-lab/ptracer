@@ -16,7 +16,7 @@ int main(){
 
 
     Scene universe;
-    ObjHolder source = std::make_unique<Sphere>(GeoVec{100,100,100}, 100.0);
+    ObjHolder source = std::make_unique<Sphere>(GeoVec{100,300,100}, 50.0);
     source->SetColor({255,255,255}).SetMaterial(Material::kLightSource);
     universe.AddObject(std::move(source));
 
@@ -24,11 +24,11 @@ int main(){
     sphere->SetColor({255, 129, 63}).SetMaterial(Material::kCommon);
     universe.AddObject(std::move(sphere));
 
-    Camera cam{600, 400, 500};
+    Camera cam{600, 400, 500, 42, 2.0};
     std::vector<Pixel> all_pixels = cam.MakeAllPixels();
 
     for(size_t i=0; i<all_pixels.size(); i++) {
-        all_pixels[i].TracePixel(universe, i);
+        all_pixels[i].TracePixel(universe);
     }
 
     std::ofstream image("test.ppm");
