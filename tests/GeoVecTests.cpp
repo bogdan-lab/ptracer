@@ -104,7 +104,14 @@ TEST(GeoVecTests, Operators) {
     GeoVec res4{5.0, 11.0, -4*M_PI};
     EXPECT_EQ(res4, x1-x0);
     EXPECT_EQ(res4, -x0+x1);
+}
 
+TEST(GeoVecTests, GetDistance) {
+    GeoVec p1{0,1,2};
+    GeoVec p2{3,4,5};
 
+    EXPECT_EQ(dist_btw_points(p1, p1), 0);
+    EXPECT_EQ(dist_btw_points(p1, p2), std::sqrt(27));
+    EXPECT_EQ(dist_btw_points(p2, p1), std::sqrt(27));
 }
 

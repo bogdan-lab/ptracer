@@ -16,6 +16,7 @@ struct Ray{
         dir_(std::move(dir.Norm())) {}
 
     Ray& Advance(double dist) {
+        assert(dist>0);
         pos_ = pos_ + dist*dir_;
         return *this;
     }

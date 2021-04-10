@@ -67,4 +67,9 @@ inline GeoVec operator-(const GeoVec& v){
     return {-v.x_, -v.y_, -v.z_};
 }
 
+inline double dist_btw_points(const GeoVec& lhs, const GeoVec& rhs) {
+    GeoVec tmp{lhs, rhs};
+    return tmp.Len();
+}
+
 #endif 	//GEO_VEC_H

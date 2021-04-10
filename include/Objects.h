@@ -47,7 +47,10 @@ private:
     double r_;
 public:
     Sphere() = delete;
-    Sphere(const GeoVec& gc, double gr) : center_(gc), r_(gr) {}
+    Sphere(const GeoVec& gc, double gr)
+        : center_(gc), r_(gr) {
+        assert(r_>0);
+    }
 
     std::optional<double> GetClosesDist(const Ray &ray) const override;
 
@@ -55,10 +58,13 @@ public:
         return (p - center_)/r_;
     }
 
-    void Reflect(Ray &ray_in, double dist) const override {
-        ray_in.Advance(dist);
-        GeoVec norm = GetNorm(ray_in.pos_);
-        ray_in.dir_ = ray_in.dir_ + 2*ray_in.dir_.Dot(norm)*norm;
+    void Reflect(Ray &ray, double dist) const override {
+        assert(dist_btw_points(ray.pos_, center_)>r_);
+        ray.Advance(dist);
+        assert(dist_btw_points(ray.pos_, center_)>=r_);
+        GeoVec norm = GetNorm(ray.pos_);
+        ray.dir_ = ray.dir_ - 2*ray.dir_.Dot(norm)*norm;
+        assert(ray.dir_.Len()==1);
     }
 };
 

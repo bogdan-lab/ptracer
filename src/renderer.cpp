@@ -15,7 +15,7 @@ Color Renderer::RenderRay(const Ray &ray, const Scene &universe) {
     const auto& all_objects = universe.GetObjects();
     BounceRecord bc_rec;
     while (curr_bounces < BOUNCE_LIMIT-1) {
-        //should take into account al trace if eventually it heats light source!
+        //should take into account all trace ONLY if eventually it heats light source!
         //so check that last hit separately
         curr_bounces++;
         bc_rec = MakeRayBounce(curr_ray, all_objects);

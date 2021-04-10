@@ -21,11 +21,7 @@ TEST (RayTests, Advance) {
     EXPECT_EQ(r.pos_, exp_pos);
     EXPECT_EQ(r.dir_, exp_dir);
 
-    r.Advance(-7);
-    GeoVec exp_pos2{1,2,-1};
-    GeoVec exp_dir2{0,0,1};
-    EXPECT_EQ(r.pos_, exp_pos2);
-    EXPECT_EQ(r.dir_, exp_dir2);
+    EXPECT_DEBUG_DEATH(r.Advance(-7), "");
 
     Ray r2{GeoVec{1,2,3}, GeoVec{0,4,3}};
     r2.Advance(10);
