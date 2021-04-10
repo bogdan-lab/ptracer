@@ -12,13 +12,13 @@ struct Color {
 
     Color() = default;
 
-    Color(int32_t R, int32_t G, int32_t B) {
+    Color(int64_t R, int64_t G, int64_t B) {
         red_ = ColorClamp(R);
         green_ = ColorClamp(G);
         blue_ = ColorClamp(B);
     }
 
-    uint8_t ColorClamp(int32_t val) {
+    uint8_t ColorClamp(int64_t val) {
         auto high = std::numeric_limits<uint8_t>::max();
         auto low = std::numeric_limits<uint8_t>::min();
         return static_cast<uint8_t>(val>=high ? high : (val<=low ? low : val));

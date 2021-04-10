@@ -20,6 +20,7 @@ class Object {
 private:
     Color color_;
     Material mat_;
+    double hit_precision_ = 1e-9;
 public:
 
     Object& SetColor(const Color& col) {
@@ -32,8 +33,14 @@ public:
         return *this;
     }
 
+    Object& SetHitPrecision(double prc) {
+        hit_precision_ = prc;
+        return *this;
+    }
+
     const Color& GetColor() const {return color_;}
     Material GetMaterial() const {return mat_;}
+    double GetHitPrecision() const {return hit_precision_;}
 
     virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
     virtual GeoVec GetNorm(const GeoVec& p) const = 0;
@@ -59,12 +66,16 @@ public:
     }
 
     void Reflect(Ray &ray, double dist) const override {
-        assert(dist_btw_points(ray.pos_, center_)>r_);
+        const auto& ray_dir = ray.GetDir();
+        const auto& ray_pos = ray.GetPos();
+        assert(dist_btw_points(ray_pos, center_)>r_);
         ray.Advance(dist);
-        assert(dist_btw_points(ray.pos_, center_)>=r_);
-        GeoVec norm = GetNorm(ray.pos_);
-        ray.dir_ = ray.dir_ - 2*ray.dir_.Dot(norm)*norm;
-        assert(ray.dir_.Len()==1);
+        while(dist_btw_points(ray_pos, center_)<=r_) {
+            ray.StepBack(GetHitPrecision());
+        }
+        assert(dist_btw_points(ray_pos, center_)>r_);
+        GeoVec norm = GetNorm(ray_pos);
+        ray.UpdateDirection(ray_dir - 2*ray_dir.Dot(norm)*norm);
     }
 };
 

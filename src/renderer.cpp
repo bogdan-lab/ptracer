@@ -47,8 +47,11 @@ BounceRecord Renderer::MakeRayBounce(Ray &ray, const ObjectCollection &all_objec
     size_t obj_idx = 0;
     double min_dist = std::numeric_limits<double>::max();
     for (size_t i=0; i<all_objects.size(); i++) {
-        dist = all_objects[i]->GetClosesDist(ray);
-        if(dist && min_dist<*dist) {
+        const auto& cur_obj = all_objects[i];
+        dist = cur_obj->GetClosesDist(ray);
+        if(dist
+           && dist>cur_obj->GetHitPrecision()
+           && min_dist>*dist) {
             min_dist = *dist;
             obj_idx = i;
         }
@@ -68,14 +71,14 @@ BounceRecord Renderer::MakeRayBounce(Ray &ray, const ObjectCollection &all_objec
 
 
 Color Renderer::GetAverageColor(const std::vector<Color> colors) {
-    uint32_t r = 0;
-    uint32_t g = 0;
-    uint32_t b = 0;
+    int64_t r = 0;
+    int64_t g = 0;
+    int64_t b = 0;
     for (const auto& el : colors) {
         r += el.red_;
         g += el.green_;
         b += el.blue_;
     }
-    const uint32_t b_num = static_cast<uint32_t>(colors.size());
+    const int64_t b_num = static_cast<int64_t>(colors.size());
     return {r/b_num, g/b_num, b/b_num};
 }

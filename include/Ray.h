@@ -4,9 +4,11 @@
 #include "GeoVec.h"
 #include <utility>
 
-struct Ray{
+class Ray{
     GeoVec pos_;
     GeoVec dir_;
+
+public:
 
     Ray() = delete;
     Ray(const GeoVec& pos, const GeoVec& dir) :
@@ -20,6 +22,21 @@ struct Ray{
         pos_ = pos_ + dist*dir_;
         return *this;
     }
+
+    Ray& StepBack(double dist) {
+        assert(dist>0);
+        pos_ = pos_ - dist*dir_;
+        return *this;
+    }
+
+    Ray& UpdateDirection(const GeoVec& new_dir){
+        dir_ = new_dir;
+        dir_.Norm();
+        return *this;
+    }
+
+    const GeoVec& GetPos() const { return pos_; }
+    const GeoVec& GetDir() const { return dir_; }
 };
 
 

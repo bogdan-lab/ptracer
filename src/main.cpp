@@ -17,7 +17,7 @@ int main(){
 
     Scene universe;
     ObjHolder source = std::make_unique<Sphere>(GeoVec{100,100,100}, 100.0);
-    source->SetMaterial(Material::kLightSource);
+    source->SetColor({255,255,255}).SetMaterial(Material::kLightSource);
     universe.AddObject(std::move(source));
 
     ObjHolder sphere  = std::make_unique<Sphere>(GeoVec{300, 100, 100}, 100.0);

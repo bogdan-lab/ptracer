@@ -39,41 +39,38 @@ TEST (SphereTests, Reflect) {
     Sphere s{GeoVec{0,0,0}, 3};
     Ray r_inside{GeoVec{1,0,0}, GeoVec{12,5,6}};
     EXPECT_DEATH(s.Reflect(r_inside, 20), "");
-    Ray r_go_inside{GeoVec{5,0,0}, GeoVec{-1,0,0}};
-    EXPECT_DEATH(s.Reflect(r_go_inside, 4), "");
 
     {//0 degree incident
         Ray r{GeoVec{5,0,0}, GeoVec{-1,0,0}};
         s.Reflect(r, 2.0);
         GeoVec exp_pos{3,0,0};
         GeoVec exp_dir{1,0,0};
-        EXPECT_EQ(exp_dir, r.dir_);
-        EXPECT_EQ(exp_pos, r.pos_);
+        EXPECT_EQ(exp_dir, r.GetDir());
+        EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, 1.1*s.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, s.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, s.GetHitPrecision());
     }
-    {//grazing incidence
-        Ray r{GeoVec{5,3,0}, GeoVec{-1,0,0}};
-        s.Reflect(r, 5);
-        GeoVec exp_pos{0,3,0};
-        GeoVec exp_dir{-1,0,0};
-        EXPECT_EQ(exp_dir, r.dir_);
-        EXPECT_EQ(exp_pos, r.pos_);
-    }
+
     Sphere s2{GeoVec{0,0,0}, 5};
     {//general case
         Ray r{GeoVec{7,3,0}, GeoVec{-1,0,0}};
         s2.Reflect(r, 3);
         GeoVec exp_pos{4,3,0};
         GeoVec exp_dir{0.28, 0.96, 0};
-        EXPECT_DOUBLE_EQ(exp_dir.x_, r.dir_.x_);
-        EXPECT_DOUBLE_EQ(exp_dir.y_, r.dir_.y_);
-        EXPECT_DOUBLE_EQ(exp_dir.z_, r.dir_.z_);
-        EXPECT_EQ(exp_pos, r.pos_);
+        EXPECT_NEAR(exp_dir.x_, r.GetDir().x_, s2.GetHitPrecision());
+        EXPECT_NEAR(exp_dir.y_, r.GetDir().y_, s2.GetHitPrecision());
+        EXPECT_NEAR(exp_dir.z_, r.GetDir().z_, s2.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, 1.1*s2.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, 1.1*s2.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, 1.1*s2.GetHitPrecision());
     }
 }
 
 
 TEST (SphereTests, GetClosestDistance) {
     Sphere s{GeoVec{0,0,0}, 5};
+    Ray death_ray{GeoVec{5,0,0}, GeoVec{1,2,3}};
+    EXPECT_DEBUG_DEATH(s.GetClosesDist(death_ray),"");
     {	//trivial distance
         Ray r{GeoVec{7,0,0}, GeoVec{-1,0,0}};
         std::optional<double> res = s.GetClosesDist(r);
@@ -99,8 +96,7 @@ TEST (SphereTests, GetClosestDistance) {
     {	//grazing
         Ray r{GeoVec{7,5,0}, GeoVec{-1,0,0}};
         std::optional<double> res = s.GetClosesDist(r);
-        EXPECT_TRUE(res);
-        EXPECT_EQ(7, *res);
+        EXPECT_FALSE(res);
     }
 }
 
