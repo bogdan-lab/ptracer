@@ -13,7 +13,7 @@ struct Ray{
         pos_(pos), dir_(dir) {dir_.Norm();}
 
     Ray(GeoVec&& pos, GeoVec&& dir) : pos_(std::move(pos)),
-        dir_(std::move(dir.Norm())) {} 	 	//TODO check if here we will still get move!
+        dir_(std::move(dir.Norm())) {}
 
     Ray& Advance(double dist) {
         pos_ = pos_ + dist*dir_;
