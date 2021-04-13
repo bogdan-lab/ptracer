@@ -100,3 +100,130 @@ TEST (SphereTests, GetClosestDistance) {
     }
 }
 
+
+
+TEST (TriangleTests, Creation) {
+    {
+        Triangle tr{GeoVec{0,0,0}, GeoVec{0,17,0}, GeoVec{1.3,0,0}};
+        GeoVec exp_n{0, 0, -1};
+        GeoVec res_n = tr.GetNorm(GeoVec{0,0,0});
+        EXPECT_EQ(exp_n, res_n);
+    }
+    {
+        Triangle tr{GeoVec{0,0,0}, GeoVec{0,0,0.1}, GeoVec{10,0,0}};
+        GeoVec exp_n{0, 1, 0};
+        GeoVec res_n = tr.GetNorm(GeoVec{0,0,0});
+        EXPECT_EQ(exp_n, res_n);
+    }
+    {
+        Triangle tr{GeoVec{0,0,0}, GeoVec{0,M_PI,0}, GeoVec{0,0,-1.3}};
+        GeoVec exp_n{-1, 0, 0};
+        GeoVec res_n = tr.GetNorm(GeoVec{0,0,0});
+        EXPECT_EQ(exp_n, res_n);
+    }
+}
+
+
+TEST (TriangleTests, CheckPointInTriangle) {
+    Triangle tr{GeoVec{0,0,0}, GeoVec{0,1,0}, GeoVec{1,0,0}};
+    {
+        GeoVec p{0.25, 0.25, 0};
+        EXPECT_TRUE(tr.CheckInTriangle(p));
+    }
+    {
+        GeoVec p{1.5, 0.25, 0};
+        EXPECT_FALSE(tr.CheckInTriangle(p));
+    }
+    {
+        GeoVec p{0.25, 1.5, 0};
+        EXPECT_FALSE(tr.CheckInTriangle(p));
+    }
+    {
+        GeoVec p{-0.25, 0.25, 0};
+        EXPECT_FALSE(tr.CheckInTriangle(p));
+    }
+    {
+        GeoVec p{0.25, -0.25, 0};
+        EXPECT_FALSE(tr.CheckInTriangle(p));
+    }
+}
+
+TEST (TriangleTests, GetClosestDistance) {
+    Triangle tr{GeoVec{0,0,0}, GeoVec{1,0,0}, GeoVec{0,1,0}};
+    {
+        GeoVec pos{0.0, 0.0, 3};
+        GeoVec dir{0.0, 4, -3};
+        Ray r{pos, dir};
+        std::optional<double> dist = tr.GetClosesDist(r);
+        EXPECT_FALSE(dist);
+    }
+    {
+        GeoVec pos{0.0, 0.0, 3};
+        GeoVec dir{0.0, 4, 3};
+        Ray r{pos, dir};
+        std::optional<double> dist = tr.GetClosesDist(r);
+        EXPECT_FALSE(dist);
+    }
+    {
+        GeoVec pos{0.25, 0.25, 37};
+        GeoVec dir{0,0,-1};
+        Ray r{pos, dir};
+        std::optional<double> dist = tr.GetClosesDist(r);
+        EXPECT_TRUE(dist);
+        EXPECT_DOUBLE_EQ(*dist, 37);
+    }
+    {
+        GeoVec pos{0.25, -3.75, 3};
+        GeoVec dir{0, 4, -3};
+        Ray r{pos, dir};
+        std::optional<double> dist = tr.GetClosesDist(r);
+        EXPECT_TRUE(dist);
+        EXPECT_DOUBLE_EQ(*dist, 5);
+    }
+    Triangle tr2{GeoVec{0,0,0}, GeoVec{0,1,0}, GeoVec{1,0,0}};
+    {
+        GeoVec pos{0.25, 0.25, 37};
+        GeoVec dir{0,0,-1};
+        Ray r{pos, dir};
+        std::optional<double> dist = tr2.GetClosesDist(r);
+        EXPECT_FALSE(dist);
+    }
+}
+
+TEST (TriangleTests, Reflect) {
+    Triangle tr{GeoVec{0,0,0}, GeoVec{1,0,0}, GeoVec{0,1,0}};
+    {//incorrect data
+        GeoVec pos{0.25, 0.25, -37};
+        GeoVec dir{0.0,0.0,1};
+        Ray r{pos, dir};
+        EXPECT_DEBUG_DEATH(tr.Reflect(r, 37), "");
+    }
+    {//Ray 0 degree
+        GeoVec pos{0.25, 0.25, 37};
+        GeoVec dir{0.0,0.0,-1};
+        Ray r{pos, dir};
+        tr.Reflect(r, 37);
+        GeoVec exp_dir{0.0,0.0,1.0};
+        GeoVec exp_pos{0.25,0.25,0.0};
+        EXPECT_EQ(exp_dir, r.GetDir());
+        EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, tr.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, tr.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, tr.GetHitPrecision());
+    }
+    {//General case
+        GeoVec pos{0.25, -3.75, 3};
+        GeoVec dir{0.0,4.0,-3};
+        Ray r{pos, dir};
+        tr.Reflect(r, 5);
+        GeoVec exp_dir{0.0,4.0,3.0};
+        exp_dir.Norm();
+        GeoVec exp_pos{0.25,0.25,0.0};
+        EXPECT_EQ(exp_dir, r.GetDir());
+        EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, tr.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, tr.GetHitPrecision());
+        EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, tr.GetHitPrecision());
+    }
+}
+
+
+

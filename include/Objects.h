@@ -105,14 +105,30 @@ public:
     void Reflect(Ray& ray, double dist) const override {
         const auto& ray_dir = ray.GetDir();
         const auto& ray_pos = ray.GetPos();
+        assert(ray_dir.Dot(norm_)<0);
         ray.Advance(dist);
         GeoVec check_vec{p0_, ray_pos};
         while(check_vec.Dot(norm_)<=0) {
             ray.StepBack(GetHitPrecision());
+            check_vec = {p0_, ray_pos};
         }
         GeoVec norm = GetNorm(ray_pos);
         ray.UpdateDirection(ray_dir - 2*ray_dir.Dot(norm)*norm);
 
+    }
+
+    bool CheckInTriangle(const GeoVec& point) const {
+        //TODO looks like this can be improved if we use normalized triangle!
+        //TODO assert that point is on the triangle surface!
+        GeoVec to_p0{point, p0_};
+        GeoVec to_p1{point, p1_};
+        GeoVec to_p2{point, p2_};
+        GeoVec v0 = to_p0.Cross(to_p1);
+        GeoVec v1 = to_p1.Cross(to_p2);
+        GeoVec v2 = to_p2.Cross(to_p0);
+        if(v0.Dot(norm_)<=0 || v1.Dot(norm_)<=0 || v2.Dot(norm_)<=0)
+            return false;
+        return true;
     }
 };
 
