@@ -5,7 +5,6 @@
 #include <optional>
 #include <limits>
 
-size_t Renderer::BOUNCE_LIMIT = 10;
 
 
 Color Renderer::RenderRay(const Ray &ray, const Scene &universe) {

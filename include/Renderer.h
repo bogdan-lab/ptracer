@@ -26,6 +26,8 @@ struct BounceRecord {
 
 class Renderer {
 private:
+    //TODO Current architecture does not allow me to set this parameter for my pixels. Move it to Camera class as accessible field.
+    //Do we really need this class? its entire purpose is in BOUNCE LIMIT and other stuff can be putted into the pixel methods..
     static size_t BOUNCE_LIMIT;
     std::vector<Color> bounce_colors_;
 
@@ -43,6 +45,7 @@ public:
 
 };
 
+inline size_t Renderer::BOUNCE_LIMIT = 50;
 
 
 #endif //RENDERER_H
