@@ -6,7 +6,9 @@
 #include "Color.h"
 
 #include <optional>
-
+#include <random>
+#include <cmath>
+#include <memory>
 
 enum class Material {
     kCommon,
@@ -15,13 +17,55 @@ enum class Material {
 };
 
 
+struct Reflector {
+    virtual GeoVec operator()(std::mt19937& rnd, const GeoVec& dir, const GeoVec& norm) const = 0;
+    virtual ~Reflector() = default;
+};
+
+using ReflectorHolder = std::unique_ptr<Reflector>;
+
+struct MirrorReflector : public Reflector {
+
+    GeoVec operator()([[maybe_unused]] std::mt19937& rnd, const GeoVec& dir, const GeoVec& norm) const override {
+        assert(dir.Dot(norm)<0);
+        return dir - 2*dir.Dot(norm)*norm;
+    }
+};
+
+struct DiffuseReflector : public Reflector {
+    GeoVec operator()(std::mt19937& rnd, const GeoVec& dir, const GeoVec& norm) const override {
+        assert(dir.Dot(norm)<0);
+        std::uniform_real_distribution<double>phi_gen{0, 2*M_PI};
+        GeoVec y_ort = norm.Cross(dir).Norm();
+        GeoVec x_ort = y_ort.Cross(norm).Norm();
+        double phi = phi_gen(rnd);
+        double sin_phi = std::sin(phi);
+        double cos_phi = std::cos(phi);
+        std::uniform_real_distribution<double> cos_th_gen{0, 1.0};
+        double cos_theta = cos_th_gen(rnd);
+        double sin_theta = std::sqrt(1 - cos_theta*cos_theta);
+        return {
+            norm.x_*cos_theta + sin_theta*(sin_phi*x_ort.x_ + cos_phi*y_ort.x_),
+            norm.y_*cos_theta + sin_theta*(sin_phi*x_ort.y_ + cos_phi*y_ort.y_),
+            norm.z_*cos_theta + sin_theta*(sin_phi*x_ort.z_ + cos_phi*y_ort.z_)
+        };
+    }
+};
+
 
 class Object {
 private:
+    ReflectorHolder reflector_;
+    double hit_precision_ = 1e-9;
     Color color_;
     Material mat_;
-    double hit_precision_ = 1e-9;
+    std::mt19937 rnd_;
 public:
+
+    Object& SetReflector(ReflectorHolder new_ref) {
+        reflector_.reset(new_ref.release());
+        return *this;
+    }
 
     Object& SetColor(const Color& col) {
         color_ = col;
@@ -38,13 +82,26 @@ public:
         return *this;
     }
 
+    Object& SetSeed(size_t s) {
+        rnd_.seed(s);
+        return *this;
+    }
+
     const Color& GetColor() const {return color_;}
     Material GetMaterial() const {return mat_;}
     double GetHitPrecision() const {return hit_precision_;}
+    const Reflector& GetReflector() const {
+        assert(reflector_);
+        return *reflector_;
+    }
+    std::mt19937& AccessRnd() {
+        return rnd_;
+    }
+
 
     virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
     virtual GeoVec GetNorm(const GeoVec& p) const = 0;
-    virtual void Reflect(Ray& ray, double dist) const = 0;
+    virtual void Reflect(Ray& ray, double dist) = 0;
     virtual ~Object() = default;
 };
 
@@ -65,7 +122,7 @@ public:
         return (p - center_)/r_;
     }
 
-    void Reflect(Ray &ray, double dist) const override {
+    void Reflect(Ray &ray, double dist) override {
         const auto& ray_dir = ray.GetDir();
         const auto& ray_pos = ray.GetPos();
         assert(dist_btw_points(ray_pos, center_)>r_);
@@ -75,7 +132,8 @@ public:
         }
         assert(dist_btw_points(ray_pos, center_)>r_);
         GeoVec norm = GetNorm(ray_pos);
-        ray.UpdateDirection(ray_dir - 2*ray_dir.Dot(norm)*norm);
+        const auto& reflector = GetReflector();
+        ray.UpdateDirection(reflector(AccessRnd(), ray_dir, norm));
     }
 };
 
@@ -102,7 +160,7 @@ public:
     GeoVec GetNorm(const GeoVec& /*p*/) const override {return norm_;}
 
     //TODO code duplication looks like Reflect should be defined in separate class and belong to Object field
-    void Reflect(Ray& ray, double dist) const override {
+    void Reflect(Ray& ray, double dist) override {
         const auto& ray_dir = ray.GetDir();
         const auto& ray_pos = ray.GetPos();
         assert(ray_dir.Dot(norm_)<0);
@@ -113,7 +171,8 @@ public:
             check_vec = {p0_, ray_pos};
         }
         GeoVec norm = GetNorm(ray_pos);
-        ray.UpdateDirection(ray_dir - 2*ray_dir.Dot(norm)*norm);
+        const auto& reflector = GetReflector();
+        ray.UpdateDirection(reflector(AccessRnd(), ray_dir, norm));
 
     }
 
