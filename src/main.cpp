@@ -3,7 +3,6 @@
 #include "Objects.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "Renderer.h"
 #include "Pixel.h"
 
 

@@ -88,5 +88,4 @@ public:
 };
 
 inline size_t Camera::SAMPLES_PER_PIXEL = 10;
-
 #endif  //CAMERA_H
