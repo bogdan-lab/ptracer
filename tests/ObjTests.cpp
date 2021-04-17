@@ -37,9 +37,12 @@ TEST (SphereTests, GetNorm) {
 
 TEST (SphereTests, Reflect) {
     Sphere s{GeoVec{0,0,0}, 3};
-    Ray r_inside{GeoVec{1,0,0}, GeoVec{12,5,6}};
-    EXPECT_DEATH(s.Reflect(r_inside, 20), "");
-
+#ifndef NDEBUG
+    {
+        Ray r{GeoVec{1,0,0}, GeoVec{12,5,6}};
+        EXPECT_DEATH(s.Reflect(r, 20), "");
+    }
+#endif //NDEBUG
     {//0 degree incident
         Ray r{GeoVec{5,0,0}, GeoVec{-1,0,0}};
         s.Reflect(r, 2.0);
@@ -69,8 +72,12 @@ TEST (SphereTests, Reflect) {
 
 TEST (SphereTests, GetClosestDistance) {
     Sphere s{GeoVec{0,0,0}, 5};
-    Ray death_ray{GeoVec{5,0,0}, GeoVec{1,2,3}};
-    EXPECT_DEBUG_DEATH(s.GetClosesDist(death_ray),"");
+#ifndef NDEBUG
+    {
+        Ray r{GeoVec{5,0,0}, GeoVec{1,2,3}};
+        EXPECT_DEATH(s.GetClosesDist(r),"");
+    }
+#endif //NDEBUG
     {	//trivial distance
         Ray r{GeoVec{7,0,0}, GeoVec{-1,0,0}};
         std::optional<double> res = s.GetClosesDist(r);
@@ -192,12 +199,14 @@ TEST (TriangleTests, GetClosestDistance) {
 
 TEST (TriangleTests, Reflect) {
     Triangle tr{GeoVec{0,0,0}, GeoVec{1,0,0}, GeoVec{0,1,0}};
+#ifndef NDEBUG
     {//incorrect data
         GeoVec pos{0.25, 0.25, -37};
         GeoVec dir{0.0,0.0,1};
         Ray r{pos, dir};
-        EXPECT_DEBUG_DEATH(tr.Reflect(r, 37), "");
+        EXPECT_DEATH(tr.Reflect(r, 37), "");
     }
+#endif //NDEBUG
     {//Ray 0 degree
         GeoVec pos{0.25, 0.25, 37};
         GeoVec dir{0.0,0.0,-1};

@@ -5,6 +5,7 @@ add_executable(unit_tests
     ColorTests.cpp
     RayTests.cpp
     ObjTests.cpp
+    CameraTests.cpp
     )
 
 target_link_libraries(unit_tests PRIVATE ptracer CONAN_PKG::gtest)

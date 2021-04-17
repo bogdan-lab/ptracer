@@ -33,8 +33,10 @@ TEST(GeoVecTests, Norm) {
     EXPECT_EQ(x0.y_, -0.8);
     EXPECT_EQ(x0.z_, 0.6);
 
+#ifndef NDEBUG
     GeoVec x1{0,0,0};
     EXPECT_DEATH(x1.Norm(), "");
+#endif //NDEBUG
 }
 
 TEST(GeoVecTests, DotProduct) {
@@ -91,8 +93,9 @@ TEST(GeoVecTests, Operators) {
     GeoVec res1{2.0, 3.0, -M_PI};
     EXPECT_EQ(x1/3, res1);
 
+#ifndef NDEBUG
     EXPECT_DEATH(x1/0, "");
-
+#endif //NDEBUG
     GeoVec res2{12.0, 18.0, -6*M_PI};
     EXPECT_EQ(res2, x1*2);
     EXPECT_EQ(res2, 2*x1);

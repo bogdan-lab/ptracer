@@ -45,7 +45,7 @@ public:
     BounceRecord MakeRayBounce(Ray& ray, const ObjectCollection& all_objects);
 
 
-
+    const std::vector<Ray>& GetPixelRays() const {return in_rays_;}
     const Color& GetPixelColor() const {return color_;}
 };
 

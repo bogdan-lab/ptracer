@@ -100,7 +100,6 @@ Scene MakeSimpleRoomScene(double width, double height, double depth, double src_
 
 
 
-
 int main(){
     double width = 600;
     double height = 400;

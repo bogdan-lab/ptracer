@@ -61,6 +61,7 @@ public:
     }
 
     Pixel CreatePixel(double x_coor, double y_coor) const {
+        assert(SAMPLES_PER_PIXEL>0);
         std::vector<Ray> px_rays;
         px_rays.reserve(SAMPLES_PER_PIXEL);
         for(size_t i=0; i<SAMPLES_PER_PIXEL; i++) {
@@ -84,6 +85,7 @@ public:
     double GetWidth() const {return width_;}
     double GetHeight() const {return height_;}
     double GetDistToPlane() const {return dist_to_plane_;}
+    const GeoVec& GetCamPos() const {return pos_;}
 
 };
 

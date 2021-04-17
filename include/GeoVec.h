@@ -63,6 +63,10 @@ inline bool operator==(const GeoVec& lhs, const GeoVec& rhs) {
     return lhs.x_ == rhs.x_ && lhs.y_ == rhs.y_ && lhs.z_ == rhs.z_;
 }
 
+inline bool operator!=(const GeoVec& lhs, const GeoVec& rhs) {
+    return lhs.x_ != rhs.x_ || lhs.y_ != rhs.y_ || lhs.z_ == rhs.z_;
+}
+
 inline GeoVec operator-(const GeoVec& v){
     return {-v.x_, -v.y_, -v.z_};
 }
