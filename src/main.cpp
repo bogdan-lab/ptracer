@@ -103,9 +103,13 @@ Scene MakeSimpleRoomScene(double width, double height, double depth, double src_
 
 
 int main(){
-
-    Scene universe = MakeSimpleRoomScene(600, 400, 400, 50.0);
-    Camera cam{600, 400, 500, 42, 2.0};
+    double width = 600;
+    double height = 400;
+    double scene_depth = 400;
+    double cam_dist = 500;
+    Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
+    Camera cam{width, height, cam_dist};
+    cam.SetRSmooth(2.0).SetSeed(42);
     std::vector<Pixel> all_pixels = cam.MakeAllPixels();
 
     for(size_t i=0; i<all_pixels.size(); i++) {
