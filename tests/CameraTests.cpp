@@ -22,37 +22,47 @@ TEST (CameraTests, Creation) {
     }
 }
 
-//TODO change test since now it is std::optional
-/*
 TEST (CameraTests, MakeCameraRay) {
     Camera cam{600,400,4};
     cam.SetRSmooth(0);
     {
-        Ray r = cam.MakeCameraRay(0, 0);
+        std::optional<Ray> r = cam.MakeCameraRay(0, 0);
+        EXPECT_TRUE(r);
         GeoVec exp_pos{300, 200, -4};
         GeoVec exp_dir{exp_pos, GeoVec{0,0,0}};
         exp_dir.Norm();
-        EXPECT_EQ(exp_pos, r.GetPos());
-        EXPECT_EQ(exp_dir, r.GetDir());
+        EXPECT_EQ(exp_pos, r->GetPos());
+        EXPECT_EQ(exp_dir, r->GetDir());
     }
     {
-        Ray r = cam.MakeCameraRay(300,200);
+        std::optional<Ray> r = cam.MakeCameraRay(300,200);
+        EXPECT_TRUE(r);
         GeoVec exp_pos{300, 200, -4};
         GeoVec exp_dir{exp_pos, GeoVec{300,200,0}};
         exp_dir.Norm();
-        EXPECT_EQ(exp_pos, r.GetPos());
-        EXPECT_EQ(exp_dir, r.GetDir());
+        EXPECT_EQ(exp_pos, r->GetPos());
+        EXPECT_EQ(exp_dir, r->GetDir());
 
     }
     cam.SetRSmooth(3).SetSeed(42);
+    size_t init_num = 1000;
     {
-        for(size_t i=0; i<1000; i++){
-            Ray r = cam.MakeCameraRay(300, 200);
-            EXPECT_GE(r.GetDir().z_, 0.8);
+        for(size_t i=0; i<init_num; i++){
+            std::optional<Ray> r = cam.MakeCameraRay(300, 200);
+            EXPECT_TRUE(r);
+            EXPECT_GE(r->GetDir().z_, 0.8);
         }
     }
+    {
+        std::vector<Ray> correct_rays;
+        for(size_t i=0; i<init_num; i++) {
+            std::optional<Ray> r = cam.MakeCameraRay(0, 0);
+            if (r) correct_rays.push_back(std::move(*r));
+        }
+        EXPECT_LE(correct_rays.size(), init_num);
+    }
 }
-*/
+
 
 TEST (CameraTests, CreatePixel) {
     Camera cam{600,400,4};

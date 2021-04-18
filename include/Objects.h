@@ -37,6 +37,9 @@ struct DiffuseReflector : public Reflector {
         assert(dir.Dot(norm)<0);
         std::uniform_real_distribution<double>phi_gen{0, 2*M_PI};
         GeoVec y_ort = norm.Cross(dir).Norm();
+        if(dir.Dot(norm)==-1) {
+            y_ort = norm.Cross(dir + GeoVec{phi_gen(rnd), phi_gen(rnd), phi_gen(rnd)});
+        }
         GeoVec x_ort = y_ort.Cross(norm).Norm();
         double phi = phi_gen(rnd);
         double sin_phi = std::sin(phi);
