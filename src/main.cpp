@@ -27,16 +27,16 @@ Scene MakeSimpleRoomScene(double width, double height, double depth, double src_
 
     Scene universe;
 
-    ObjHolder source = std::make_unique<Sphere>(GeoVec{width/2, 2*src_radius, depth/2}, src_radius);
-    source->SetColor({255,255,255})
-            .SetMaterial(Material::kLightSource)
+    ObjHolder source = std::make_unique<Sphere>(GeoVec{width/2, height - src_radius, depth/2}, src_radius);
+    source->SetColor({0,0,255})
+            .SetMaterial(Material::kCommon)
             .SetHitPrecision(HIT_PRECISION)
             .SetReflector(std::make_unique<DiffuseReflector>());
     universe.AddObject(std::move(source));
     Material wall_material = Material::kCommon;
     //Creating walls
     //LEFT
-    Color left_wall_color {200,100,100};
+    Color left_wall_color {255,0,0};
     ObjHolder trian = std::make_unique<Triangle>(fbot_left, btop_left, ftop_left);
     trian->SetColor(left_wall_color)
             .SetMaterial(wall_material)
@@ -50,7 +50,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth, double src_
             .SetReflector(std::make_unique<DiffuseReflector>());
     universe.AddObject(std::move(trian));
     //RIGHT
-    Color right_wall_color{100,200,100};
+    Color right_wall_color{0,255,0};
     trian = std::make_unique<Triangle>(fbot_right, ftop_right, btop_right);
     trian->SetColor(right_wall_color)
             .SetMaterial(wall_material)
@@ -64,7 +64,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth, double src_
             .SetReflector(std::make_unique<DiffuseReflector>());
     universe.AddObject(std::move(trian));
     //Bottom
-    Color bot_wall_color{50,50,255};
+    Color bot_wall_color{100,100,100};
     trian = std::make_unique<Triangle>(fbot_left, fbot_right, bbot_left);
     trian->SetColor(bot_wall_color)
             .SetMaterial(wall_material)
@@ -78,16 +78,16 @@ Scene MakeSimpleRoomScene(double width, double height, double depth, double src_
             .SetReflector(std::make_unique<DiffuseReflector>());
     universe.AddObject(std::move(trian));
     //TOP
-    Color top_wall_color{250,50,255};
+    Color top_wall_color{255,255,255};
     trian = std::make_unique<Triangle>(ftop_right, ftop_left, btop_left);
     trian->SetColor(top_wall_color)
-            .SetMaterial(wall_material)
+            .SetMaterial(Material::kLightSource)
             .SetHitPrecision(HIT_PRECISION)
             .SetReflector(std::make_unique<DiffuseReflector>());
     universe.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(ftop_right, btop_left, btop_right);
     trian->SetColor(top_wall_color)
-            .SetMaterial(wall_material)
+            .SetMaterial(Material::kLightSource)
             .SetHitPrecision(HIT_PRECISION)
             .SetReflector(std::make_unique<DiffuseReflector>());
     universe.AddObject(std::move(trian));
@@ -118,9 +118,9 @@ int main(){
     double cam_dist = 500;
     Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
     Camera cam{width, height, cam_dist};
-    cam.SetRSmooth(0.0).SetSeed(42);
-    Camera::SetSamplePerPixel(40); 	//TODO BUG!!! for some reasones it never stops at large enough values!
-    Pixel::SetBounceLimit(500);
+    cam.SetRSmooth(0.0).SetSeed(42);//TODO BUG!!! if RSmooth is >0 cannot finish calculation...
+    Camera::SetSamplePerPixel(100);
+    Pixel::SetBounceLimit(1000);
     std::vector<Pixel> all_pixels = cam.MakeAllPixels();
 
     size_t px_num = all_pixels.size();
@@ -129,7 +129,7 @@ int main(){
         if((10*i)%px_num==0)
             std::cerr << 100.0*i/px_num << "%\n";
     }
-
+    std::cerr << "Saving file\n";
     std::ofstream image("test.ppm");
     image << "P3\n";
     image << cam.GetWidth() << ' ' << cam.GetHeight() << '\n';

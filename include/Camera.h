@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <random>
 #include <vector>
+#include <optional>
 
 class Camera {
 private:
@@ -49,15 +50,16 @@ public:
     }
 
 
-    Ray MakeCameraRay(double x_coor, double y_coor) const {
+    std::optional<Ray> MakeCameraRay(double x_coor, double y_coor) const {
         double r = r_dist_(rnd_);
         double alpha = angle_dist_(rnd_);
         double x = x_coor + r*std::cos(alpha);
         double y = y_coor + r*std::sin(alpha);
+        if (x>width_ || x<0 || y>width_ || y<0) return std::nullopt;
         GeoVec dir = {x - pos_.x_,
                       y - pos_.y_,
                       dist_to_plane_};
-        return {pos_, dir};
+        return Ray{pos_, dir};
     }
 
     Pixel CreatePixel(double x_coor, double y_coor) const {
@@ -65,7 +67,8 @@ public:
         std::vector<Ray> px_rays;
         px_rays.reserve(SAMPLES_PER_PIXEL);
         for(size_t i=0; i<SAMPLES_PER_PIXEL; i++) {
-            px_rays.emplace_back(MakeCameraRay(x_coor, y_coor));
+            std::optional<Ray> r = MakeCameraRay(x_coor, y_coor);
+            if (r) px_rays.push_back(std::move(*r)); 	 	//TODO Check if I can move from std::optional
         }
         return Pixel{std::move(px_rays)};
     }

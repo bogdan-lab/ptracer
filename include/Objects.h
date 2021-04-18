@@ -26,7 +26,7 @@ using ReflectorHolder = std::unique_ptr<Reflector>;
 
 struct MirrorReflector : public Reflector {
 
-    GeoVec operator()([[maybe_unused]] std::mt19937& rnd, const GeoVec& dir, const GeoVec& norm) const override {
+    GeoVec operator()( std::mt19937& /*rnd*/, const GeoVec& dir, const GeoVec& norm) const override {
         assert(dir.Dot(norm)<0);
         return dir - 2*dir.Dot(norm)*norm;
     }
@@ -44,11 +44,7 @@ struct DiffuseReflector : public Reflector {
         std::uniform_real_distribution<double> cos_th_gen{0, 1.0};
         double cos_theta = cos_th_gen(rnd);
         double sin_theta = std::sqrt(1 - cos_theta*cos_theta);
-        return {
-            norm.x_*cos_theta + sin_theta*(sin_phi*x_ort.x_ + cos_phi*y_ort.x_),
-            norm.y_*cos_theta + sin_theta*(sin_phi*x_ort.y_ + cos_phi*y_ort.y_),
-            norm.z_*cos_theta + sin_theta*(sin_phi*x_ort.z_ + cos_phi*y_ort.z_)
-        };
+        return norm*cos_theta + sin_theta*(sin_phi*x_ort + cos_phi*y_ort);
     }
 };
 
@@ -59,7 +55,7 @@ private:
     double hit_precision_ = 1e-9;
     Color color_;
     Material mat_;
-    std::mt19937 rnd_;
+    mutable std::mt19937 rnd_;
 public:
 
     Object& SetReflector(ReflectorHolder new_ref) {
@@ -94,14 +90,15 @@ public:
         assert(reflector_);
         return *reflector_;
     }
-    std::mt19937& AccessRnd() {
-        return rnd_;
+
+    GeoVec DoReflection(const GeoVec& dir, const GeoVec& norm) const {
+        return (*reflector_)(rnd_, dir, norm);
     }
 
 
     virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
     virtual GeoVec GetNorm(const GeoVec& p) const = 0;
-    virtual void Reflect(Ray& ray, double dist) = 0;
+    virtual void Reflect(Ray& ray, double dist) const = 0;
     virtual ~Object() = default;
 };
 
@@ -122,7 +119,7 @@ public:
         return (p - center_)/r_;
     }
 
-    void Reflect(Ray &ray, double dist) override {
+    void Reflect(Ray &ray, double dist) const override {
         const auto& ray_dir = ray.GetDir();
         const auto& ray_pos = ray.GetPos();
         assert(dist_btw_points(ray_pos, center_)>r_);
@@ -131,9 +128,7 @@ public:
             ray.StepBack(GetHitPrecision());
         }
         assert(dist_btw_points(ray_pos, center_)>r_);
-        GeoVec norm = GetNorm(ray_pos);
-        const auto& reflector = GetReflector();
-        ray.UpdateDirection(reflector(AccessRnd(), ray_dir, norm));
+        ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
     }
 };
 
@@ -159,8 +154,7 @@ public:
 
     GeoVec GetNorm(const GeoVec& /*p*/) const override {return norm_;}
 
-    //TODO code duplication looks like Reflect should be defined in separate class and belong to Object field
-    void Reflect(Ray& ray, double dist) override {
+    void Reflect(Ray& ray, double dist) const override {
         const auto& ray_dir = ray.GetDir();
         const auto& ray_pos = ray.GetPos();
         assert(ray_dir.Dot(norm_)<0);
@@ -170,10 +164,7 @@ public:
             ray.StepBack(GetHitPrecision());
             check_vec = {p0_, ray_pos};
         }
-        GeoVec norm = GetNorm(ray_pos);
-        const auto& reflector = GetReflector();
-        ray.UpdateDirection(reflector(AccessRnd(), ray_dir, norm));
-
+        ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
     }
 
     bool CheckInTriangle(const GeoVec& point) const {
