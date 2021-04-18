@@ -163,7 +163,7 @@ public:
         assert(ray_dir.Dot(norm_)<0);
         ray.Advance(dist);
         GeoVec check_vec{p0_, ray_pos};
-        while(check_vec.Dot(norm_)<=0) {
+        while(check_vec.Dot(norm_)<0) {
             ray.StepBack(GetHitPrecision());
             check_vec = {p0_, ray_pos};
         }

@@ -118,8 +118,8 @@ int main(){
     double cam_dist = 500;
     Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
     Camera cam{width, height, cam_dist};
-    cam.SetRSmooth(0.0).SetSeed(42);//TODO BUG!!! if RSmooth is >0 cannot finish calculation...
-    Camera::SetSamplePerPixel(100);
+    cam.SetRSmooth(1.0).SetSeed(42);
+    Camera::SetSamplePerPixel(400);
     Pixel::SetBounceLimit(1000);
     std::vector<Pixel> all_pixels = cam.MakeAllPixels();
 

@@ -62,7 +62,7 @@ public:
         return Ray{pos_, dir};
     }
 
-    Pixel CreatePixel(double x_coor, double y_coor) const {
+    Pixel CreatePixel(double x_coor, double y_coor) const {//TODO change pixel generation! since I meet memory limit here!
         assert(SAMPLES_PER_PIXEL>0);
         std::vector<Ray> px_rays;
         px_rays.reserve(SAMPLES_PER_PIXEL);
