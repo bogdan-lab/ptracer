@@ -1,94 +1,88 @@
-﻿#include<gtest/gtest.h>
+﻿#include <gtest/gtest.h>
 
-#include<Camera.h>
+#include <Camera.h>
 
-
-TEST (CameraTests, Creation) {
+TEST(CameraTests, Creation) {
 #ifndef NDEBUG
-    {
-        auto get_cam = [](double w, double h, double d){return Camera{w,h,d};};
-        EXPECT_DEATH(get_cam(600,400,0 ), "");
-        EXPECT_DEATH(get_cam(600,0,100 ), "");
-        EXPECT_DEATH(get_cam(0,400,100 ), "");
-        EXPECT_DEATH(get_cam(600,400,-1), "");
-        EXPECT_DEATH(get_cam(600,-1,100), "");
-        EXPECT_DEATH(get_cam(-1,400,100), "");
-    }
-#endif //NDEBUG
-    {
-        Camera cam{600, 400, 50};
-        GeoVec exp{300,200,-50};
-        EXPECT_EQ(cam.GetCamPos(), exp);
-    }
+  {
+    auto get_cam = [](double w, double h, double d) { return Camera{w, h, d}; };
+    EXPECT_DEATH(get_cam(600, 400, 0), "");
+    EXPECT_DEATH(get_cam(600, 0, 100), "");
+    EXPECT_DEATH(get_cam(0, 400, 100), "");
+    EXPECT_DEATH(get_cam(600, 400, -1), "");
+    EXPECT_DEATH(get_cam(600, -1, 100), "");
+    EXPECT_DEATH(get_cam(-1, 400, 100), "");
+  }
+#endif  // NDEBUG
+  {
+    Camera cam{600, 400, 50};
+    GeoVec exp{300, 200, -50};
+    EXPECT_EQ(cam.GetCamPos(), exp);
+  }
 }
 
-TEST (CameraTests, MakeCameraRay) {
-    Camera cam{600,400,4};
-    cam.SetRSmooth(0);
-    {
-        std::optional<Ray> r = cam.MakeCameraRay(0, 0);
-        EXPECT_TRUE(r);
-        GeoVec exp_pos{300, 200, -4};
-        GeoVec exp_dir{exp_pos, GeoVec{0,0,0}};
-        exp_dir.Norm();
-        EXPECT_EQ(exp_pos, r->GetPos());
-        EXPECT_EQ(exp_dir, r->GetDir());
+TEST(CameraTests, MakeCameraRay) {
+  Camera cam{600, 400, 4};
+  cam.SetRSmooth(0);
+  {
+    std::optional<Ray> r = cam.MakeCameraRay(0, 0);
+    EXPECT_TRUE(r);
+    GeoVec exp_pos{300, 200, -4};
+    GeoVec exp_dir{exp_pos, GeoVec{0, 0, 0}};
+    exp_dir.Norm();
+    EXPECT_EQ(exp_pos, r->GetPos());
+    EXPECT_EQ(exp_dir, r->GetDir());
+  }
+  {
+    std::optional<Ray> r = cam.MakeCameraRay(300, 200);
+    EXPECT_TRUE(r);
+    GeoVec exp_pos{300, 200, -4};
+    GeoVec exp_dir{exp_pos, GeoVec{300, 200, 0}};
+    exp_dir.Norm();
+    EXPECT_EQ(exp_pos, r->GetPos());
+    EXPECT_EQ(exp_dir, r->GetDir());
+  }
+  cam.SetRSmooth(3).SetSeed(42);
+  size_t init_num = 1000;
+  {
+    for (size_t i = 0; i < init_num; i++) {
+      std::optional<Ray> r = cam.MakeCameraRay(300, 200);
+      EXPECT_TRUE(r);
+      EXPECT_GE(r->GetDir().z_, 0.8);
     }
-    {
-        std::optional<Ray> r = cam.MakeCameraRay(300,200);
-        EXPECT_TRUE(r);
-        GeoVec exp_pos{300, 200, -4};
-        GeoVec exp_dir{exp_pos, GeoVec{300,200,0}};
-        exp_dir.Norm();
-        EXPECT_EQ(exp_pos, r->GetPos());
-        EXPECT_EQ(exp_dir, r->GetDir());
-
+  }
+  {
+    std::vector<Ray> correct_rays;
+    for (size_t i = 0; i < init_num; i++) {
+      std::optional<Ray> r = cam.MakeCameraRay(0, 0);
+      if (r) correct_rays.push_back(std::move(*r));
     }
-    cam.SetRSmooth(3).SetSeed(42);
-    size_t init_num = 1000;
-    {
-        for(size_t i=0; i<init_num; i++){
-            std::optional<Ray> r = cam.MakeCameraRay(300, 200);
-            EXPECT_TRUE(r);
-            EXPECT_GE(r->GetDir().z_, 0.8);
-        }
-    }
-    {
-        std::vector<Ray> correct_rays;
-        for(size_t i=0; i<init_num; i++) {
-            std::optional<Ray> r = cam.MakeCameraRay(0, 0);
-            if (r) correct_rays.push_back(std::move(*r));
-        }
-        EXPECT_LE(correct_rays.size(), init_num);
-    }
+    EXPECT_LE(correct_rays.size(), init_num);
+  }
 }
 
-
-TEST (CameraTests, CreatePixel) {
-    Camera cam{600,400,4};
-    cam.SetRSmooth(0);
-    Camera::SetSamplePerPixel(100);
+TEST(CameraTests, CreatePixel) {
+  Camera cam{600, 400, 4};
+  cam.SetRSmooth(0);
+  Camera::SetSamplePerPixel(100);
 #ifndef NDEBUG
-        EXPECT_DEATH(Camera::SetSamplePerPixel(0), "");
-#endif //NDEBUG
-    {
-        Pixel px = cam.CreatePixel(125, 64);
-        const auto& r_begin = px.GetPixelRays().front();
-        for (const auto& r : px.GetPixelRays()) {
-            EXPECT_EQ(r_begin.GetDir(), r.GetDir());
-            EXPECT_EQ(r_begin.GetPos(), r.GetPos());
-        }
+  EXPECT_DEATH(Camera::SetSamplePerPixel(0), "");
+#endif  // NDEBUG
+  {
+    Pixel px = cam.CreatePixel(125, 64);
+    const auto& r_begin = px.GetPixelRays().front();
+    for (const auto& r : px.GetPixelRays()) {
+      EXPECT_EQ(r_begin.GetDir(), r.GetDir());
+      EXPECT_EQ(r_begin.GetPos(), r.GetPos());
     }
-    cam.SetRSmooth(3).SetSeed(42);
-    {
-        Pixel px = cam.CreatePixel(300, 200);
-        const auto& all_rays = px.GetPixelRays();
-        for (size_t i=1; i<all_rays.size(); i++) {
-            EXPECT_NE(all_rays[i-1].GetDir(), all_rays[i].GetDir());
-            EXPECT_NE(all_rays[i-1].GetPos(), all_rays[i].GetPos());
-        }
+  }
+  cam.SetRSmooth(3).SetSeed(42);
+  {
+    Pixel px = cam.CreatePixel(300, 200);
+    const auto& all_rays = px.GetPixelRays();
+    for (size_t i = 1; i < all_rays.size(); i++) {
+      EXPECT_NE(all_rays[i - 1].GetDir(), all_rays[i].GetDir());
+      EXPECT_NE(all_rays[i - 1].GetPos(), all_rays[i].GetPos());
     }
+  }
 }
-
-
-

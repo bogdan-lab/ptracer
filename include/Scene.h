@@ -1,31 +1,28 @@
 ﻿#ifndef SCENE_H
 #define SCENE_H
 
-#include "Objects.h"
-
-#include <vector>
 #include <memory>
 #include <utility>
+#include <vector>
 
-using ObjHolder =  std::unique_ptr<Object>;
+#include "Objects.h"
+
+using ObjHolder = std::unique_ptr<Object>;
 using ObjectCollection = std::vector<ObjHolder>;
 
 class Scene {
-private:
-    ObjectCollection scn_;
+ private:
+  ObjectCollection scn_;
 
-public:
-    Scene() = default;
+ public:
+  Scene() = default;
 
-    Scene& AddObject(std::unique_ptr<Object> obj_ptr) {
-        scn_.push_back(std::move(obj_ptr));
-        return *this;
-    }
+  Scene& AddObject(std::unique_ptr<Object> obj_ptr) {
+    scn_.push_back(std::move(obj_ptr));
+    return *this;
+  }
 
-    const ObjectCollection& GetObjects() const { return scn_; }
-
+  const ObjectCollection& GetObjects() const { return scn_; }
 };
 
-
-
-#endif //SCENE_H
+#endif  // SCENE_H
