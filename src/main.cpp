@@ -1,10 +1,10 @@
-﻿#include "GeoVec.h"
-#include <fstream>
+﻿#include <fstream>
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include "Camera.h"
+#include "GeoVec.h"
 #include "Objects.h"
 #include "Pixel.h"
 #include "Ray.h"
@@ -113,26 +113,25 @@ int main() {
   double width = 600;
   double height = 400;
   double scene_depth = 400;
-  double cam_dist = 500;
   Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
-  Camera cam{width, height, cam_dist};
-  cam.SetRSmooth(1.0).SetSeed(42);
+  Camera cam;
   Camera::SetSamplePerPixel(400);
   Pixel::SetBounceLimit(1000);
-  std::vector<Pixel> all_pixels = cam.MakeAllPixels();
 
-  size_t px_num = all_pixels.size();
+  size_t px_num = 600 * 400;
+  std::vector<Color> col_vec;
+  col_vec.reserve(px_num);
   for (size_t i = 0; i < px_num; i++) {
-    all_pixels[i].TracePixel(universe);
+    col_vec.push_back(cam.CreatePixel(i).TracePixel(universe).GetPixelColor());
     if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
   }
   std::cerr << "Saving file\n";
   std::ofstream image("test.ppm");
   image << "P3\n";
-  image << cam.GetWidth() << ' ' << cam.GetHeight() << '\n';
+  image << cam.GetXPXSize() << ' ' << cam.GetYPXSize() << '\n';
   image << 255 << '\n';
-  for (const auto& px : all_pixels) {
-    image << px.GetPixelColor() << '\n';
+  for (const auto& col : col_vec) {
+    image << col << '\n';
   }
 
   return 0;

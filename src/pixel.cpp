@@ -1,12 +1,13 @@
 ﻿#include "Pixel.h"
 
-void Pixel::TracePixel(const Scene& universe) {
+Pixel& Pixel::TracePixel(const Scene& universe) {
   std::vector<Color> accum_colors_;
   accum_colors_.reserve(in_rays_.size());
   for (const auto& ray : in_rays_) {
     accum_colors_.push_back(RenderRay(ray, universe));
   }
   color_ = GetAverageColor(accum_colors_);
+  return *this;
 }
 
 Color Pixel::GetAverageColor(const std::vector<Color> colors) {

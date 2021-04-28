@@ -39,7 +39,7 @@ class Pixel {
   static Color GetAverageColor(const std::vector<Color> colors);
   static void SetBounceLimit(size_t g_lim) { BOUNCE_LIMIT = g_lim; }
 
-  void TracePixel(const Scene& universe);
+  Pixel& TracePixel(const Scene& universe);
   Color RenderRay(const Ray& ray, const Scene& universe);
   BounceRecord MakeRayBounce(Ray& ray, const ObjectCollection& all_objects);
 
