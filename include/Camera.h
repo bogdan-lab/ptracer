@@ -27,7 +27,10 @@ class Camera {
   mutable std::mt19937 rnd_{0};
 
  public:
-  static void SetSamplePerPixel(size_t g_num) { SAMPLES_PER_PIXEL = g_num; }
+  static void SetSamplePerPixel(size_t g_num) {
+    assert(g_num != 0);
+    SAMPLES_PER_PIXEL = g_num;
+  }
 
   Camera() = default;
 
@@ -68,7 +71,7 @@ class Camera {
   Pixel CreatePixel(size_t idx) const {
     // idx - pixel idx on the screen. Assume that pixels are counted from the
     // top left corner to the right
-    assert(SAMPLES_PER_PIXEL > 0);
+    assert(idx < GetPxNum());
     assert(right_coor_ > left_coor_);
     assert(top_coor_ > bot_coor_);
     assert(w_px_num_ != 0);
@@ -96,6 +99,7 @@ class Camera {
   double GetBotCoor() const { return bot_coor_; }
   size_t GetWidthInPx() const { return w_px_num_; }
   size_t GetHeightInPx() const { return h_px_num_; }
+  size_t GetPxNum() const { return w_px_num_ * h_px_num_; }
   double GetDistToPlane() const { return dist_to_plane_; }
 };
 
