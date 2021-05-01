@@ -35,8 +35,8 @@ TEST(CameraTests, Creation) {
   {
     Camera cam;
     cam.SetSamplePerPixel(23);
-    auto res = cam.CreatePixel(0);
-    EXPECT_EQ(res.GetPixelRays().size(), 23);
+    auto res = cam.GetPixelRays(0);
+    EXPECT_EQ(res.size(), 23);
   }
 }
 
@@ -51,9 +51,9 @@ TEST(CameraTests, CreatePixel) {
   double px_radius = 0.5 * std::sqrt(dx * dx + dy * dy);
   const auto& d = cam.GetDistToPlane();
   double min_cos_alpha = d / std::sqrt(d * d + px_radius * px_radius);
-  auto px = cam.CreatePixel(0);
+  auto px_r = cam.GetPixelRays(0);
   GeoVec cam_dir{0, 0, 1};
-  for (const auto& r : px.GetPixelRays()) {
+  for (const auto& r : px_r) {
     double cos_alpha = cam_dir.Dot(r.GetDir());
     EXPECT_GE(cos_alpha, min_cos_alpha);
   }

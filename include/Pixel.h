@@ -24,27 +24,17 @@ struct BounceRecord {
 class Pixel {
  private:
   static size_t BOUNCE_LIMIT;
-  std::vector<Ray> in_rays_;
-  Color color_;
 
  public:
-  Pixel() = delete;
-
-  explicit Pixel(const std::vector<Ray>& rays)
-      : in_rays_(rays), color_(0, 0, 0) {}
-
-  explicit Pixel(std::vector<Ray>&& rays)
-      : in_rays_(std::move(rays)), color_(0, 0, 0) {}
+  Pixel() = default;
 
   static Color GetAverageColor(const std::vector<Color> colors);
   static void SetBounceLimit(size_t g_lim) { BOUNCE_LIMIT = g_lim; }
 
-  Pixel& TracePixel(const Scene& universe);
-  Color RenderRay(const Ray& ray, const Scene& universe);
-  BounceRecord MakeRayBounce(Ray& ray, const ObjectCollection& all_objects);
-
-  const std::vector<Ray>& GetPixelRays() const { return in_rays_; }
-  const Color& GetPixelColor() const { return color_; }
+  Color TraceRays(const std::vector<Ray>& in_rays, const Scene& universe) const;
+  Color RenderRay(const Ray& ray, const Scene& universe) const;
+  BounceRecord MakeRayBounce(Ray& ray,
+                             const ObjectCollection& all_objects) const;
 };
 
 inline size_t Pixel::BOUNCE_LIMIT = 50;

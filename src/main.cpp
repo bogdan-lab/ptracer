@@ -115,15 +115,15 @@ int main() {
   double scene_depth = 400;
   Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
   Camera cam;
-  cam.SetWidthInPixel(1200).SetHeightInPixel(800);
-  Camera::SetSamplePerPixel(2000);
+  Camera::SetSamplePerPixel(400);
   Pixel::SetBounceLimit(1000);
 
   size_t px_num = cam.GetPxNum();
   std::vector<Color> col_vec;
   col_vec.reserve(px_num);
+  Pixel gen_px;
   for (size_t i = 0; i < px_num; i++) {
-    col_vec.push_back(cam.CreatePixel(i).TracePixel(universe).GetPixelColor());
+    col_vec.push_back(gen_px.TraceRays(cam.GetPixelRays(i), universe));
     if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
   }
   std::cerr << "Saving file\n";

@@ -1,13 +1,13 @@
 ﻿#include "Pixel.h"
 
-Pixel& Pixel::TracePixel(const Scene& universe) {
+Color Pixel::TraceRays(const std::vector<Ray>& in_rays,
+                       const Scene& universe) const {
   std::vector<Color> accum_colors_;
-  accum_colors_.reserve(in_rays_.size());
-  for (const auto& ray : in_rays_) {
+  accum_colors_.reserve(in_rays.size());
+  for (const auto& ray : in_rays) {
     accum_colors_.push_back(RenderRay(ray, universe));
   }
-  color_ = GetAverageColor(accum_colors_);
-  return *this;
+  return GetAverageColor(accum_colors_);
 }
 
 Color Pixel::GetAverageColor(const std::vector<Color> colors) {
@@ -23,7 +23,7 @@ Color Pixel::GetAverageColor(const std::vector<Color> colors) {
   return {r / b_num, g / b_num, b / b_num};
 }
 
-Color Pixel::RenderRay(const Ray& ray, const Scene& universe) {
+Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
   std::vector<Color> bounce_colors;
   bounce_colors.reserve(BOUNCE_LIMIT);
   size_t curr_bounces = 0;
@@ -58,7 +58,7 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) {
 }
 
 BounceRecord Pixel::MakeRayBounce(Ray& ray,
-                                  const ObjectCollection& all_objects) {
+                                  const ObjectCollection& all_objects) const {
   std::optional<double> dist = std::nullopt;
   size_t obj_idx = 0;
   double min_dist = std::numeric_limits<double>::max();

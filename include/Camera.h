@@ -68,7 +68,7 @@ class Camera {
     return *this;
   }
 
-  Pixel CreatePixel(size_t idx) const {
+  std::vector<Ray> GetPixelRays(size_t idx) const {
     // idx - pixel idx on the screen. Assume that pixels are counted from the
     // top left corner to the right
     assert(idx < GetPxNum());
@@ -90,7 +90,7 @@ class Camera {
       px_rays.emplace_back(pos, GeoVec{x_dist(rnd_) - pos.x_,
                                        y_dist(rnd_) - pos.y_, dist_to_plane_});
     }
-    return Pixel{std::move(px_rays)};
+    return px_rays;
   }
 
   double GetLeftCoor() const { return left_coor_; }
