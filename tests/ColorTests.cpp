@@ -1,4 +1,5 @@
 ﻿#include <gtest/gtest.h>
+
 #include <sstream>
 
 #include "Color.h"
@@ -20,4 +21,27 @@ TEST(ColorTests, Writing) {
   std::stringstream res;
   res << tst;
   EXPECT_EQ(exp.str(), res.str());
+}
+
+TEST(ColorTests, Truncation) {
+  {
+    Color tr{0, 0, 0};
+    Color g{23, 4, 51};
+    g.TruncByColor(tr);
+    EXPECT_EQ(tr, g);
+  }
+  {
+    Color tr{10, 2, 10};
+    Color g{23, 4, 51};
+    g.TruncByColor(tr);
+    EXPECT_EQ(tr, g);
+  }
+  {
+    Color tr{100, 100, 100};
+    Color g{23, 4, 51};
+    g.TruncByColor(tr);
+    EXPECT_EQ(g.red_, 23);
+    EXPECT_EQ(g.green_, 4);
+    EXPECT_EQ(g.blue_, 51);
+  }
 }

@@ -23,6 +23,12 @@ struct Color {
     auto low = std::numeric_limits<uint8_t>::min();
     return static_cast<uint8_t>(val >= high ? high : (val <= low ? low : val));
   }
+
+  void TruncByColor(const Color& tr_col) {
+    if (red_ > tr_col.red_) red_ = tr_col.red_;
+    if (green_ > tr_col.green_) green_ = tr_col.green_;
+    if (blue_ > tr_col.blue_) blue_ = tr_col.blue_;
+  }
 };
 
 inline std::ostream& operator<<(std::ostream& out, uint8_t val) {
