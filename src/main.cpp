@@ -128,7 +128,7 @@ int main() {
   std::cerr << "Saving file\n";
   std::ofstream image("test.ppm");
   image << "P3\n";
-  image << cam.GetXPXSize() << ' ' << cam.GetYPXSize() << '\n';
+  image << cam.GetWidthInPx() << ' ' << cam.GetHeightInPx() << '\n';
   image << 255 << '\n';
   for (const auto& col : col_vec) {
     image << col << '\n';
