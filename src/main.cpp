@@ -109,6 +109,17 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   return universe;
 }
 
+/*
+ * CURRENT PROBLEMS!!
+ * 1. If ray hit mirror tha later does not have its color -> it should not be
+ * taken into account!
+ * 2. I want to see flares on the objects
+ * 3. Objects could have different reflectivity/absorption. Maybe something like
+ * one of ten ray trails results in Color{0,0,0} etc
+ * 4. Change saving format
+ * 5. Make it fast!
+ * */
+
 int main() {
   double width = 600;
   double height = 400;
