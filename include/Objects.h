@@ -33,11 +33,12 @@ struct DiffuseReflector : public Reflector {
                     const GeoVec& norm) const override {
     assert(dir.Dot(norm) < 0);
     std::uniform_real_distribution<double> phi_gen{0, 2 * M_PI};
-    GeoVec y_ort = norm.Cross(dir).Norm();
-    if (dir.Dot(norm) == -1) {
+    GeoVec y_ort = norm.Cross(dir);
+    if (y_ort.x_ == 0 && y_ort.y_ == 0 && y_ort.z_ == 0) {
       y_ort =
           norm.Cross(dir + GeoVec{phi_gen(rnd), phi_gen(rnd), phi_gen(rnd)});
     }
+    y_ort.Norm();
     GeoVec x_ort = y_ort.Cross(norm).Norm();
     double phi = phi_gen(rnd);
     double sin_phi = std::sin(phi);

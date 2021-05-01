@@ -1,4 +1,5 @@
 ﻿#include <gtest/gtest.h>
+
 #include "GeoVec.h"
 
 TEST(GeoVecTests, Creation) {
@@ -25,10 +26,10 @@ TEST(GeoVecTests, Norm) {
   GeoVec x0{0, -4, 3};
   x0.Norm();
 
-  EXPECT_EQ(x0.Len(), 1);
-  EXPECT_EQ(x0.x_, 0);
-  EXPECT_EQ(x0.y_, -0.8);
-  EXPECT_EQ(x0.z_, 0.6);
+  EXPECT_DOUBLE_EQ(x0.Len(), 1);
+  EXPECT_DOUBLE_EQ(x0.x_, 0);
+  EXPECT_DOUBLE_EQ(x0.y_, -0.8);
+  EXPECT_DOUBLE_EQ(x0.z_, 0.6);
 
 #ifndef NDEBUG
   GeoVec x1{0, 0, 0};

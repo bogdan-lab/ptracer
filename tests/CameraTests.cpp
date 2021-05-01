@@ -10,7 +10,7 @@ TEST(CameraTests, Creation) {
   }
   {
     Camera cam;
-    cam.SetBotCoor(100).SetTopCoor(0);
+    cam.SetBotCoor(0).SetTopCoor(100);
     EXPECT_DEATH(cam.CreatePixel(0), "");
   }
   {

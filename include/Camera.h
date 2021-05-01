@@ -73,7 +73,7 @@ class Camera {
     // top left corner to the right
     assert(idx < GetPxNum());
     assert(right_coor_ > left_coor_);
-    assert(top_coor_ > bot_coor_);
+    assert(top_coor_ < bot_coor_);
     assert(w_px_num_ != 0);
     assert(h_px_num_ != 0);
     double dx = (right_coor_ - left_coor_) / static_cast<double>(w_px_num_);

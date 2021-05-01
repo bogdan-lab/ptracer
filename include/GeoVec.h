@@ -19,11 +19,11 @@ struct GeoVec {
   double Len() const { return std::sqrt(x_ * x_ + y_ * y_ + z_ * z_); }
 
   GeoVec& Norm() {
-    double l = Len();
-    assert(l != 0);
-    x_ /= l;
-    y_ /= l;
-    z_ /= l;
+    assert(Len() != 0);
+    double mult = 1.0 / Len();
+    x_ *= mult;
+    y_ *= mult;
+    z_ *= mult;
     return *this;
   }
 
