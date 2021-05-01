@@ -115,10 +115,11 @@ int main() {
   double scene_depth = 400;
   Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
   Camera cam;
-  Camera::SetSamplePerPixel(400);
+  cam.SetWidthInPixel(1200).SetHeightInPixel(800);
+  Camera::SetSamplePerPixel(2000);
   Pixel::SetBounceLimit(1000);
 
-  size_t px_num = 600 * 400;
+  size_t px_num = cam.GetPxNum();
   std::vector<Color> col_vec;
   col_vec.reserve(px_num);
   for (size_t i = 0; i < px_num; i++) {

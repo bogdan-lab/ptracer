@@ -79,7 +79,7 @@ class Camera {
     double dx = (right_coor_ - left_coor_) / static_cast<double>(w_px_num_);
     double dy = (bot_coor_ - top_coor_) / static_cast<double>(h_px_num_);
     double l_bnd = left_coor_ + static_cast<double>(idx % w_px_num_) * dx;
-    double t_bnd = top_coor_ + static_cast<double>(idx / h_px_num_) * dy;
+    double t_bnd = top_coor_ + static_cast<double>(idx / w_px_num_) * dy;
     std::uniform_real_distribution<double> x_dist{l_bnd, l_bnd + dx};
     std::uniform_real_distribution<double> y_dist{t_bnd, t_bnd + dy};
     GeoVec pos{0.5 * (right_coor_ + left_coor_), 0.5 * (top_coor_ + bot_coor_),
