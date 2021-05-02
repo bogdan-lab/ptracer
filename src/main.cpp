@@ -31,7 +31,8 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   sphere->SetColor(colors::kBlue)
       .SetMaterial(Material::kReflective)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.05);
+      .SetPolishness(0.1)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(sphere));
   // REFLECTIVE SPHERE
   sphere = std::make_unique<Sphere>(
@@ -40,7 +41,18 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   sphere->SetColor(colors::kNoColor)
       .SetMaterial(Material::kReflective)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(1.0);
+      .SetPolishness(1.0)
+      .SetReflectionCoef(1.0);
+  universe.AddObject(std::move(sphere));
+  // ABSORBING SPHERE
+  sphere = std::make_unique<Sphere>(
+      GeoVec{width / 2 + 2.1 * src_radius, height - src_radius, depth / 2},
+      src_radius);
+  sphere->SetColor(colors::kPurple)
+      .SetMaterial(Material::kReflective)
+      .SetHitPrecision(HIT_PRECISION)
+      .SetPolishness(0.0)
+      .SetReflectionCoef(0.75);
   universe.AddObject(std::move(sphere));
   Material wall_material = Material::kReflective;
   // Creating walls
@@ -50,13 +62,15 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_left, bbot_left, btop_left);
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   // RIGHT
   Color right_wall_color = colors::kGreen;
@@ -64,13 +78,15 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_right, btop_right, bbot_right);
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   // Bottom
   Color bot_wall_color = colors::kGrey;
@@ -78,13 +94,15 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_right, bbot_right, bbot_left);
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   // TOP
   Color top_wall_color = colors::kWhite;
@@ -92,13 +110,15 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(ftop_right, btop_left, btop_right);
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   // BACK
   Color back_wall_color = colors::kCayan;
@@ -106,13 +126,31 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(bbot_left, bbot_right, btop_right);
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.0)
+      .SetReflectionCoef(1.0);
+  universe.AddObject(std::move(trian));
+  // FRONT
+  Color front_wall_color = colors::kNoColor;
+  trian = std::make_unique<Triangle>(fbot_left, ftop_left, ftop_right);
+  trian->SetColor(front_wall_color)
+      .SetMaterial(wall_material)
+      .SetHitPrecision(HIT_PRECISION)
+      .SetPolishness(1.0)
+      .SetReflectionCoef(1.0);
+  universe.AddObject(std::move(trian));
+  trian = std::make_unique<Triangle>(fbot_left, ftop_right, fbot_right);
+  trian->SetColor(front_wall_color)
+      .SetMaterial(wall_material)
+      .SetHitPrecision(HIT_PRECISION)
+      .SetPolishness(1.0)
+      .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
 
   return universe;
@@ -120,8 +158,6 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
 
 /*
  * CURRENT PROBLEMS!!
- * 3. Objects could have different reflectivity/absorption. Maybe something like
- * one of ten ray trails results in Color{0,0,0} etc
  * 4. Change saving format
  * 5. Make it fast!
  * 6. Why I cannot include Camera.h into Objects.h so and set empty color for
@@ -134,8 +170,8 @@ int main() {
   double scene_depth = 400;
   Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 80.0);
   Camera cam;
-  // cam.SetWidthInPixel(1200).SetHeightInPixel(800);
-  Camera::SetSamplePerPixel(400);
+  cam.SetWidthInPixel(1200).SetHeightInPixel(800);
+  Camera::SetSamplePerPixel(2000);
   Pixel::SetBounceLimit(1000);
 
   size_t px_num = cam.GetPxNum();

@@ -36,6 +36,7 @@ Color Pixel::GetAverageColor(const std::vector<Color>& colors) {
       col_num++;
     }
   }
+  if (!col_num) return colors::kBlack;
   return {r / col_num, g / col_num, b / col_num};
 }
 
@@ -93,9 +94,11 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
   switch (hit_obj->GetMaterial()) {
     case Material::kLightSource:
       break;
-    case Material::kReflective:
-      hit_obj->Reflect(ray, min_dist);
+    case Material::kReflective: {
+      bool success = hit_obj->TryReflect(ray, min_dist);
+      if (!success) return {Material::kNoMaterial, std::nullopt};
       break;
+    }
     default:
       throw std::logic_error("Met unknown material in MakeRayBounce");
   }

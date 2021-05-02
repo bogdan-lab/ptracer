@@ -69,11 +69,20 @@ class Object {
     return HybridReflect(rnd_, polishness_, dir, norm);
   }
 
-  std::mt19937& AccessRnd() const { return rnd_; }
+  bool TryReflect(Ray& ray, double dist) {
+    assert(refl_coef_ >= 0);
+    assert(refl_coef_ <= 1);
+    std::uniform_real_distribution<double> d{0, 1};
+    if (d(rnd_) < refl_coef_) {
+      Reflect(ray, dist);
+      return true;
+    }
+    return false;
+  }
 
   virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
   virtual GeoVec GetNorm(const GeoVec& p) const = 0;
-  virtual bool Reflect(Ray& ray, double dist) const = 0;
+  virtual void Reflect(Ray& ray, double dist) const = 0;
   virtual ~Object() = default;
 };
 
@@ -90,18 +99,7 @@ class Sphere : public Object {
 
   GeoVec GetNorm(const GeoVec& p) const override { return (p - center_) / r_; }
 
-  bool Reflect(Ray& ray, double dist) const override {
-    assert(GetReflectionCoefficient() >= 0);
-    assert(GetReflectionCoefficient() <= 1);
-    std::uniform_real_distribution<double> d{0, 1};
-    if (d(AccessRnd()) < GetReflectionCoefficient()) {
-      ReflectFromSphere(ray, dist);
-      return true;
-    }
-    return false;
-  }
-
-  void ReflectFromSphere(Ray& ray, double dist) const {
+  void Reflect(Ray& ray, double dist) const override {
     const auto& ray_dir = ray.GetDir();
     const auto& ray_pos = ray.GetPos();
     assert(dist_btw_points(ray_pos, center_) > r_);
@@ -136,18 +134,7 @@ class Triangle : public Object {
 
   GeoVec GetNorm(const GeoVec& /*p*/) const override { return norm_; }
 
-  bool Reflect(Ray& ray, double dist) const override {
-    assert(GetReflectionCoefficient() >= 0);
-    assert(GetReflectionCoefficient() <= 1);
-    std::uniform_real_distribution<double> d{0, 1};
-    if (d(AccessRnd()) < GetReflectionCoefficient()) {
-      ReflectFromSurface(ray, dist);
-      return true;
-    }
-    return false;
-  }
-
-  void ReflectFromSurface(Ray& ray, double dist) const {
+  void Reflect(Ray& ray, double dist) const override {
     const auto& ray_dir = ray.GetDir();
     const auto& ray_pos = ray.GetPos();
     assert(ray_dir.Dot(norm_) < 0);
