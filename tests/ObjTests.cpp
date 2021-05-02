@@ -1,8 +1,10 @@
 ﻿#include <gtest/gtest.h>
+
 #include <cmath>
 
 #include "Objects.h"
 #include "Ray.h"
+#include "Reflector.h"
 
 TEST(SphereTests, GetNorm) {
   Sphere s{GeoVec{0, 0, 0}, M_PI};
@@ -37,7 +39,7 @@ TEST(SphereTests, GetNorm) {
 
 TEST(SphereTests, Reflect) {
   Sphere s{GeoVec{0, 0, 0}, 3};
-  s.SetReflector(std::make_unique<MirrorReflector>());
+  s.SetPolishness(1.0);
 #ifndef NDEBUG
   {
     Ray r{GeoVec{1, 0, 0}, GeoVec{12, 5, 6}};
@@ -56,7 +58,7 @@ TEST(SphereTests, Reflect) {
   }
 
   Sphere s2{GeoVec{0, 0, 0}, 5};
-  s2.SetReflector(std::make_unique<MirrorReflector>());
+  s2.SetPolishness(1.0);
   {  // general case
     Ray r{GeoVec{7, 3, 0}, GeoVec{-1, 0, 0}};
     s2.Reflect(r, 3);
@@ -197,7 +199,7 @@ TEST(TriangleTests, GetClosestDistance) {
 
 TEST(TriangleTests, Reflect) {
   Triangle tr{GeoVec{0, 0, 0}, GeoVec{1, 0, 0}, GeoVec{0, 1, 0}};
-  tr.SetReflector(std::make_unique<MirrorReflector>());
+  tr.SetPolishness(1.0);
 #ifndef NDEBUG
   {  // incorrect data
     GeoVec pos{0.25, 0.25, -37};
@@ -234,21 +236,20 @@ TEST(TriangleTests, Reflect) {
 }
 
 TEST(ReflectorTests, DiffuseReflector) {
-  DiffuseReflector dif_ref;
   std::mt19937 rnd(42);
   GeoVec dir{0, 0, -1};
   size_t check_num = 1000;
   {
     GeoVec norm{0, 0, 1};
     for (size_t i = 0; i < check_num; i++) {
-      GeoVec vec = dif_ref(rnd, dir, norm);
+      GeoVec vec = DiffuseReflect(rnd, dir, norm);
       EXPECT_GE(vec.Dot(norm), 0);
     }
   }
   {
     GeoVec norm{1, 2, 3};
     for (size_t i = 0; i < check_num; i++) {
-      GeoVec vec = dif_ref(rnd, dir, norm);
+      GeoVec vec = DiffuseReflect(rnd, dir, norm);
       EXPECT_GE(vec.Dot(norm), 0);
     }
   }

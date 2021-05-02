@@ -31,7 +31,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   sphere->SetColor({0, 0, 255})
       .SetMaterial(Material::kCommon)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(sphere));
   // REFLECTIVE SPHERE
   sphere = std::make_unique<Sphere>(
@@ -39,7 +39,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       src_radius);
   sphere->SetMaterial(Material::kMirror)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<MirrorReflector>());
+      .SetPolishness(1.0);
   universe.AddObject(std::move(sphere));
   Material wall_material = Material::kCommon;
   // Creating walls
@@ -49,13 +49,13 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_left, bbot_left, btop_left);
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // RIGHT
   Color right_wall_color{0, 255, 0};
@@ -63,13 +63,13 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_right, btop_right, bbot_right);
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // Bottom
   Color bot_wall_color{100, 100, 100};
@@ -77,13 +77,13 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_right, bbot_right, bbot_left);
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // TOP
   Color top_wall_color{255, 255, 255};
@@ -91,13 +91,13 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(ftop_right, btop_left, btop_right);
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // BACK
   Color back_wall_color{0, 255, 255};
@@ -105,13 +105,13 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(bbot_left, bbot_right, btop_right);
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
       .SetHitPrecision(HIT_PRECISION)
-      .SetReflector(std::make_unique<DiffuseReflector>());
+      .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
 
   return universe;
@@ -135,6 +135,7 @@ int main() {
   double scene_depth = 400;
   Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 80.0);
   Camera cam;
+  // cam.SetWidthInPixel(1200).SetHeightInPixel(800);
   Camera::SetSamplePerPixel(400);
   Pixel::SetBounceLimit(1000);
 

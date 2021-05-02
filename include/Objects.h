@@ -9,61 +9,19 @@
 #include "Color.h"
 #include "GeoVec.h"
 #include "Ray.h"
+#include "Reflector.h"
 
 enum class Material { kNoMaterial = 0, kCommon, kLightSource, kMirror };
 
-struct Reflector {
-  virtual GeoVec operator()(std::mt19937& rnd, const GeoVec& dir,
-                            const GeoVec& norm) const = 0;
-  virtual ~Reflector() = default;
-};
-
-using ReflectorHolder = std::unique_ptr<Reflector>;
-
-struct MirrorReflector : public Reflector {
-  GeoVec operator()(std::mt19937& /*rnd*/, const GeoVec& dir,
-                    const GeoVec& norm) const override {
-    assert(dir.Dot(norm) < 0);
-    return dir - 2 * dir.Dot(norm) * norm;
-  }
-};
-
-struct DiffuseReflector : public Reflector {
-  GeoVec operator()(std::mt19937& rnd, const GeoVec& dir,
-                    const GeoVec& norm) const override {
-    assert(dir.Dot(norm) < 0);
-    std::uniform_real_distribution<double> phi_gen{0, 2 * M_PI};
-    GeoVec y_ort = norm.Cross(dir);
-    if (y_ort.x_ == 0 && y_ort.y_ == 0 && y_ort.z_ == 0) {
-      y_ort =
-          norm.Cross(dir + GeoVec{phi_gen(rnd), phi_gen(rnd), phi_gen(rnd)});
-    }
-    y_ort.Norm();
-    GeoVec x_ort = y_ort.Cross(norm).Norm();
-    double phi = phi_gen(rnd);
-    double sin_phi = std::sin(phi);
-    double cos_phi = std::cos(phi);
-    std::uniform_real_distribution<double> cos_th_gen{0, 1.0};
-    double cos_theta = cos_th_gen(rnd);
-    double sin_theta = std::sqrt(1 - cos_theta * cos_theta);
-    return norm * cos_theta + sin_theta * (sin_phi * x_ort + cos_phi * y_ort);
-  }
-};
-
 class Object {
  private:
-  ReflectorHolder reflector_;
+  double polishness_ = 0.5;
   double hit_precision_ = 1e-9;
-  Color color_;
-  Material mat_;
+  Color color_;  // TODO NO COLOR
+  Material mat_ = Material::kNoMaterial;
   mutable std::mt19937 rnd_;
 
  public:
-  Object& SetReflector(ReflectorHolder new_ref) {
-    reflector_.reset(new_ref.release());
-    return *this;
-  }
-
   Object& SetColor(const Color& col) {
     color_ = col;
     return *this;
@@ -79,6 +37,14 @@ class Object {
     return *this;
   }
 
+  Object& SetPolishness(double g_pol) {
+    if (g_pol < 0 || g_pol > 1)
+      throw std::logic_error(
+          "incorrect value of polishness. Should be in [0,1]");
+    polishness_ = g_pol;
+    return *this;
+  }
+
   Object& SetSeed(size_t s) {
     rnd_.seed(s);
     return *this;
@@ -87,13 +53,9 @@ class Object {
   const Color& GetColor() const { return color_; }
   Material GetMaterial() const { return mat_; }
   double GetHitPrecision() const { return hit_precision_; }
-  const Reflector& GetReflector() const {
-    assert(reflector_);
-    return *reflector_;
-  }
 
   GeoVec DoReflection(const GeoVec& dir, const GeoVec& norm) const {
-    return (*reflector_)(rnd_, dir, norm);
+    return HybridReflect(rnd_, polishness_, dir, norm);
   }
 
   virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
