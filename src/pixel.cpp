@@ -27,13 +27,16 @@ Color Pixel::GetAverageColor(const std::vector<Color>& colors) {
   int64_t r = 0;
   int64_t g = 0;
   int64_t b = 0;
+  int64_t col_num = 0;
   for (const auto& el : colors) {
-    r += el.red_;
-    g += el.green_;
-    b += el.blue_;
+    if (el.IsColor()) {
+      r += el.red_;
+      g += el.green_;
+      b += el.blue_;
+      col_num++;
+    }
   }
-  const int64_t b_num = static_cast<int64_t>(colors.size());
-  return {r / b_num, g / b_num, b / b_num};
+  return {r / col_num, g / col_num, b / col_num};
 }
 
 Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
@@ -53,13 +56,11 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
         bounce_colors.push_back(*bc_rec.hit_obj_color_);
         TruncColorsInTrace(bounce_colors);
         return GetAverageColor(bounce_colors);
-      case Material::kCommon:
+      case Material::kReflective:
         bounce_colors.push_back(*bc_rec.hit_obj_color_);
         break;
-      case Material::kMirror:
-        continue;
       default:
-        exit(1);
+        throw std::logic_error("Met unknown material in RenderRay()");
     }
   }
   bc_rec = MakeRayBounce(curr_ray, all_objects);
@@ -92,12 +93,11 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
   switch (hit_obj->GetMaterial()) {
     case Material::kLightSource:
       break;
-    case Material::kMirror:
-    case Material::kCommon:
+    case Material::kReflective:
       hit_obj->Reflect(ray, min_dist);
       break;
     default:
-      exit(1);
+      throw std::logic_error("Met unknown material in MakeRayBounce");
   }
   return {hit_obj->GetMaterial(), hit_obj->GetColor()};
 }

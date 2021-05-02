@@ -11,13 +11,14 @@
 #include "Ray.h"
 #include "Reflector.h"
 
-enum class Material { kNoMaterial = 0, kCommon, kLightSource, kMirror };
+// TODO here is an opportunity to add kRefractive material
+enum class Material { kNoMaterial = 0, kReflective, kLightSource };
 
 class Object {
  private:
   double polishness_ = 0.5;
   double hit_precision_ = 1e-9;
-  Color color_;  // TODO NO COLOR
+  Color color_ = colors::kNoColor;
   Material mat_ = Material::kNoMaterial;
   mutable std::mt19937 rnd_;
 

@@ -28,23 +28,24 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   // COMMON SPHERE
   ObjHolder sphere = std::make_unique<Sphere>(
       GeoVec{width / 2, height - src_radius, depth / 2}, src_radius);
-  sphere->SetColor({0, 0, 255})
-      .SetMaterial(Material::kCommon)
+  sphere->SetColor(colors::kBlue)
+      .SetMaterial(Material::kReflective)
       .SetHitPrecision(HIT_PRECISION)
-      .SetPolishness(0.0);
+      .SetPolishness(0.05);
   universe.AddObject(std::move(sphere));
   // REFLECTIVE SPHERE
   sphere = std::make_unique<Sphere>(
       GeoVec{width / 2 - 2.1 * src_radius, height - src_radius, depth / 2},
       src_radius);
-  sphere->SetMaterial(Material::kMirror)
+  sphere->SetColor(colors::kNoColor)
+      .SetMaterial(Material::kReflective)
       .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(1.0);
   universe.AddObject(std::move(sphere));
-  Material wall_material = Material::kCommon;
+  Material wall_material = Material::kReflective;
   // Creating walls
   // LEFT
-  Color left_wall_color{255, 0, 0};
+  Color left_wall_color = colors::kRed;
   ObjHolder trian = std::make_unique<Triangle>(fbot_left, btop_left, ftop_left);
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
@@ -58,7 +59,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // RIGHT
-  Color right_wall_color{0, 255, 0};
+  Color right_wall_color = colors::kGreen;
   trian = std::make_unique<Triangle>(fbot_right, ftop_right, btop_right);
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
@@ -72,7 +73,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // Bottom
-  Color bot_wall_color{100, 100, 100};
+  Color bot_wall_color = colors::kGrey;
   trian = std::make_unique<Triangle>(fbot_left, fbot_right, bbot_left);
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
@@ -86,7 +87,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // TOP
-  Color top_wall_color{255, 255, 255};
+  Color top_wall_color = colors::kWhite;
   trian = std::make_unique<Triangle>(ftop_right, ftop_left, btop_left);
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
@@ -100,7 +101,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       .SetPolishness(0.0);
   universe.AddObject(std::move(trian));
   // BACK
-  Color back_wall_color{0, 255, 255};
+  Color back_wall_color = colors::kCayan;
   trian = std::make_unique<Triangle>(bbot_left, btop_right, btop_left);
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
@@ -119,8 +120,6 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
 
 /*
  * CURRENT PROBLEMS!!
- * 2. I want to see flares on the objects -> do polishness like probability to
- * reflect as mirror
  * 3. Objects could have different reflectivity/absorption. Maybe something like
  * one of ten ray trails results in Color{0,0,0} etc
  * 4. Change saving format
