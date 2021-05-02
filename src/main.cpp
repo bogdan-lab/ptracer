@@ -113,7 +113,8 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
  * CURRENT PROBLEMS!!
  * 1. If ray hit mirror tha later does not have its color -> it should not be
  * taken into account!
- * 2. I want to see flares on the objects
+ * 2. I want to see flares on the objects -> do polishness like probability to
+ * reflect as mirror
  * 3. Objects could have different reflectivity/absorption. Maybe something like
  * one of ten ray trails results in Color{0,0,0} etc
  * 4. Change saving format

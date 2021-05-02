@@ -10,14 +10,16 @@ Color Pixel::TraceRays(const std::vector<Ray>& in_rays,
   return GetAverageColor(accum_colors);
 }
 
-void Pixel::TruncColorsByLast(std::vector<Color>& cols) {
+void Pixel::TruncColorsInTrace(std::vector<Color>& cols) {
   // Light we see is reflection of the light from source.
   // if in light in source red == 0 there could be no red in reflection!
+  // The same stays for the reflected light
   // Last note in colors is expected to be light source color -> trunc all
   // colors according to it
-  auto it_end = std::prev(cols.end());
-  for (auto it = cols.begin(); it != it_end; it++) {
-    it->TruncByColor(*it_end);
+  if (cols.empty()) return;
+  auto it_source = cols.rbegin();
+  for (auto it = std::next(it_source); it != cols.rend(); it++) {
+    it->TruncByColor(*it_source++);
   }
 }
 
@@ -52,7 +54,7 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
                                 // or "backgrounde color"
       case BounceHitInfo::kHitSource:
         bounce_colors.push_back(*bc_rec.hit_obj_color_);
-        TruncColorsByLast(bounce_colors);
+        TruncColorsInTrace(bounce_colors);
         return GetAverageColor(bounce_colors);
       case BounceHitInfo::kHitObject:
         bounce_colors.push_back(*bc_rec.hit_obj_color_);
@@ -66,7 +68,7 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
     return Color{0, 0, 0};
   }
   bounce_colors.push_back(*bc_rec.hit_obj_color_);
-  TruncColorsByLast(bounce_colors);
+  TruncColorsInTrace(bounce_colors);
   return GetAverageColor(bounce_colors);
 }
 
