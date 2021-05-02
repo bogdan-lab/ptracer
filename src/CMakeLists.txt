@@ -2,8 +2,9 @@
             objects.cpp
             pixel.cpp
             reflector.cpp
+            PngWriter.cpp
             )
-target_link_libraries(ptracer PUBLIC full_set_warnings)
+target_link_libraries(ptracer PUBLIC full_set_warnings CONAN_PKG::libpng)
 
 add_executable(mk_image
                 main.cpp)

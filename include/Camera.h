@@ -21,8 +21,8 @@ class Camera {
   double right_coor_{600.0};
   double top_coor_{0.0};
   double bot_coor_{400.0};
-  size_t w_px_num_{600};
-  size_t h_px_num_{400};
+  uint32_t w_px_num_{600};
+  uint32_t h_px_num_{400};
   double dist_to_plane_{500};
 
   // inner fields
@@ -54,11 +54,11 @@ class Camera {
     bot_coor_ = g_coor;
     return *this;
   }
-  Camera& SetWidthInPixel(size_t g_num) {
+  Camera& SetWidthInPixel(uint32_t g_num) {
     w_px_num_ = g_num;
     return *this;
   }
-  Camera& SetHeightInPixel(size_t g_num) {
+  Camera& SetHeightInPixel(uint32_t g_num) {
     h_px_num_ = g_num;
     return *this;
   }
@@ -102,9 +102,9 @@ class Camera {
   double GetRightCoor() const { return right_coor_; }
   double GetTopCoor() const { return top_coor_; }
   double GetBotCoor() const { return bot_coor_; }
-  size_t GetWidthInPx() const { return w_px_num_; }
-  size_t GetHeightInPx() const { return h_px_num_; }
-  size_t GetPxNum() const { return w_px_num_ * h_px_num_; }
+  uint32_t GetWidthInPx() const { return w_px_num_; }
+  uint32_t GetHeightInPx() const { return h_px_num_; }
+  uint32_t GetPxNum() const { return w_px_num_ * h_px_num_; }
   double GetDistToPlane() const { return dist_to_plane_; }
 };
 

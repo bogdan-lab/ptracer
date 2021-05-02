@@ -7,6 +7,7 @@
 #include "GeoVec.h"
 #include "Objects.h"
 #include "Pixel.h"
+#include "PngWriter.h"
 #include "Ray.h"
 #include "Scene.h"
 
@@ -156,22 +157,14 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   return universe;
 }
 
-/*
- * CURRENT PROBLEMS!!
- * 4. Change saving format
- * 5. Make it fast!
- * 6. Why I cannot include Camera.h into Objects.h so and set empty color for
- * objects?
- * */
-
 int main() {
   double width = 600;
   double height = 400;
   double scene_depth = 400;
   Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 80.0);
   Camera cam;
-  cam.SetWidthInPixel(1200).SetHeightInPixel(800);
-  Camera::SetSamplePerPixel(2000);
+  // cam.SetWidthInPixel(1200).SetHeightInPixel(800);
+  Camera::SetSamplePerPixel(400);
   Pixel::SetBounceLimit(1000);
 
   size_t px_num = cam.GetPxNum();
@@ -182,14 +175,11 @@ int main() {
     col_vec.push_back(gen_px.TraceRays(cam.GetPixelRays(i), universe));
     if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
   }
-  std::cerr << "Saving file\n";
-  std::ofstream image("test.ppm");
-  image << "P3\n";
-  image << cam.GetWidthInPx() << ' ' << cam.GetHeightInPx() << '\n';
-  image << 255 << '\n';
-  for (const auto& col : col_vec) {
-    image << col << '\n';
-  }
 
+  PngWriter pw{"test.png", cam.GetWidthInPx(), cam.GetHeightInPx()};
+  if (!pw.IsOk()) {
+    throw std::runtime_error("Unable to save png file");
+  }
+  pw.SaveVectorToImage(col_vec);
   return 0;
 }

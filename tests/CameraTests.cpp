@@ -6,26 +6,26 @@ TEST(CameraTests, Creation) {
   {
     Camera cam;
     cam.SetLeftCoor(100).SetRightCoor(0);
-    EXPECT_DEATH(cam.CreatePixel(0), "");
+    EXPECT_DEATH(cam.GetPixelRays(0), "");
   }
   {
     Camera cam;
     cam.SetBotCoor(0).SetTopCoor(100);
-    EXPECT_DEATH(cam.CreatePixel(0), "");
+    EXPECT_DEATH(cam.GetPixelRays(0), "");
   }
   {
     Camera cam;
     cam.SetWidthInPixel(0);
-    EXPECT_DEATH(cam.CreatePixel(0), "");
+    EXPECT_DEATH(cam.GetPixelRays(0), "");
   }
   {
     Camera cam;
     cam.SetHeightInPixel(0);
-    EXPECT_DEATH(cam.CreatePixel(0), "");
+    EXPECT_DEATH(cam.GetPixelRays(0), "");
   }
   {
     Camera cam;
-    EXPECT_DEATH(cam.CreatePixel(std::numeric_limits<size_t>::max()), "");
+    EXPECT_DEATH(cam.GetPixelRays(std::numeric_limits<size_t>::max()), "");
   }
   {
     Camera cam;

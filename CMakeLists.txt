@@ -25,6 +25,7 @@ include(../cmake/conan.cmake)
 conan_check(VERSION 1.14.4 REQUIRED)
 conan_cmake_run(REQUIRES
                 gtest/1.10.0
+                libpng/1.6.37
         OPTIONS BASIC_SETUP CMAKE_TARGETS
         BUILD missing)
 
