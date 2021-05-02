@@ -25,14 +25,22 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   GeoVec bbot_right{width, height, depth};
 
   Scene universe;
-
-  ObjHolder source = std::make_unique<Sphere>(
+  // COMMON SPHERE
+  ObjHolder sphere = std::make_unique<Sphere>(
       GeoVec{width / 2, height - src_radius, depth / 2}, src_radius);
-  source->SetColor({0, 0, 255})
+  sphere->SetColor({0, 0, 255})
       .SetMaterial(Material::kCommon)
       .SetHitPrecision(HIT_PRECISION)
       .SetReflector(std::make_unique<DiffuseReflector>());
-  universe.AddObject(std::move(source));
+  universe.AddObject(std::move(sphere));
+  // REFLECTIVE SPHERE
+  sphere = std::make_unique<Sphere>(
+      GeoVec{width / 2 - 2.1 * src_radius, height - src_radius, depth / 2},
+      src_radius);
+  sphere->SetMaterial(Material::kMirror)
+      .SetHitPrecision(HIT_PRECISION)
+      .SetReflector(std::make_unique<MirrorReflector>());
+  universe.AddObject(std::move(sphere));
   Material wall_material = Material::kCommon;
   // Creating walls
   // LEFT
@@ -92,7 +100,7 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       .SetReflector(std::make_unique<DiffuseReflector>());
   universe.AddObject(std::move(trian));
   // BACK
-  Color back_wall_color{100, 100, 100};
+  Color back_wall_color{0, 255, 255};
   trian = std::make_unique<Triangle>(bbot_left, btop_right, btop_left);
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
@@ -111,21 +119,21 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
 
 /*
  * CURRENT PROBLEMS!!
- * 1. If ray hit mirror tha later does not have its color -> it should not be
- * taken into account!
  * 2. I want to see flares on the objects -> do polishness like probability to
  * reflect as mirror
  * 3. Objects could have different reflectivity/absorption. Maybe something like
  * one of ten ray trails results in Color{0,0,0} etc
  * 4. Change saving format
  * 5. Make it fast!
+ * 6. Why I cannot include Camera.h into Objects.h so and set empty color for
+ * objects?
  * */
 
 int main() {
   double width = 600;
   double height = 400;
   double scene_depth = 400;
-  Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 50.0);
+  Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 80.0);
   Camera cam;
   Camera::SetSamplePerPixel(400);
   Pixel::SetBounceLimit(1000);

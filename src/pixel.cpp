@@ -39,33 +39,32 @@ Color Pixel::GetAverageColor(const std::vector<Color>& colors) {
 Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
   std::vector<Color> bounce_colors;
   bounce_colors.reserve(BOUNCE_LIMIT);
-  size_t curr_bounces = 0;
   Ray curr_ray = ray;
   const auto& all_objects = universe.GetObjects();
   BounceRecord bc_rec;
-  while (curr_bounces < BOUNCE_LIMIT - 1) {
-    // should take into account all trace ONLY if eventually it heats light
+  for (size_t curr_bnc = 0; curr_bnc < BOUNCE_LIMIT - 1; curr_bnc++) {
+    // should take into account all trace ONLY if eventually it hits light
     // source! so check that last hit separately
-    curr_bounces++;
     bc_rec = MakeRayBounce(curr_ray, all_objects);
-    switch (bc_rec.hit_info_) {
-      case BounceHitInfo::kHitNothing:
-        return Color{0, 0, 0};  // TODO Maybe set it somewhere as "shade color"?
-                                // or "backgrounde color"
-      case BounceHitInfo::kHitSource:
+    switch (bc_rec.hit_obj_mat_) {
+      case Material::kNoMaterial:
+        return Camera::GetEmptyColor();
+      case Material::kLightSource:
         bounce_colors.push_back(*bc_rec.hit_obj_color_);
         TruncColorsInTrace(bounce_colors);
         return GetAverageColor(bounce_colors);
-      case BounceHitInfo::kHitObject:
+      case Material::kCommon:
         bounce_colors.push_back(*bc_rec.hit_obj_color_);
         break;
+      case Material::kMirror:
+        continue;
       default:
         exit(1);
     }
   }
   bc_rec = MakeRayBounce(curr_ray, all_objects);
-  if (BounceHitInfo::kHitSource != bc_rec.hit_info_) {
-    return Color{0, 0, 0};
+  if (bc_rec.hit_obj_mat_ != Material::kLightSource) {
+    return Camera::GetEmptyColor();
   }
   bounce_colors.push_back(*bc_rec.hit_obj_color_);
   TruncColorsInTrace(bounce_colors);
@@ -87,12 +86,18 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
   }
   if (min_dist == std::numeric_limits<double>::max()) {
     // hit nothing
-    return {BounceHitInfo::kHitNothing, std::nullopt};
+    return {Material::kNoMaterial, std::nullopt};
   }
-  const auto& obj_color = all_objects[obj_idx]->GetColor();
-  if (all_objects[obj_idx]->GetMaterial() == Material::kLightSource) {
-    return {BounceHitInfo::kHitSource, obj_color};
+  const auto& hit_obj = all_objects[obj_idx];
+  switch (hit_obj->GetMaterial()) {
+    case Material::kLightSource:
+      break;
+    case Material::kMirror:
+    case Material::kCommon:
+      hit_obj->Reflect(ray, min_dist);
+      break;
+    default:
+      exit(1);
   }
-  all_objects[obj_idx]->Reflect(ray, min_dist);
-  return {BounceHitInfo::kHitObject, obj_color};
+  return {hit_obj->GetMaterial(), hit_obj->GetColor()};
 }

@@ -10,7 +10,7 @@
 #include "GeoVec.h"
 #include "Ray.h"
 
-enum class Material { kCommon, kLightSource, kMirror };
+enum class Material { kNoMaterial = 0, kCommon, kLightSource, kMirror };
 
 struct Reflector {
   virtual GeoVec operator()(std::mt19937& rnd, const GeoVec& dir,

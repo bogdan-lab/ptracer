@@ -5,19 +5,14 @@
 #include <random>
 #include <vector>
 
+#include "Camera.h"
 #include "Color.h"
+#include "Objects.h"
 #include "Ray.h"
 #include "Scene.h"
 
-enum class BounceHitInfo {
-  kUndefined = 0,
-  kHitSource,
-  kHitNothing,
-  kHitObject
-};
-
 struct BounceRecord {
-  BounceHitInfo hit_info_;
+  Material hit_obj_mat_;
   std::optional<Color> hit_obj_color_;
 };
 

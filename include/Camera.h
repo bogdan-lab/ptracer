@@ -6,6 +6,7 @@
 #include <random>
 #include <vector>
 
+#include "Color.h"
 #include "GeoVec.h"
 #include "Pixel.h"
 #include "Ray.h"
@@ -15,6 +16,7 @@ class Camera {
  private:
   // input fields
   static size_t SAMPLES_PER_PIXEL;
+  static Color EMPTY_COLOR;
   double left_coor_{0.0};
   double right_coor_{600.0};
   double top_coor_{0.0};
@@ -31,6 +33,8 @@ class Camera {
     assert(g_num != 0);
     SAMPLES_PER_PIXEL = g_num;
   }
+
+  static void SetEmptyColor(const Color& g_c) { EMPTY_COLOR = g_c; }
 
   Camera() = default;
 
@@ -93,6 +97,7 @@ class Camera {
     return px_rays;
   }
 
+  static const Color& GetEmptyColor() { return EMPTY_COLOR; }
   double GetLeftCoor() const { return left_coor_; }
   double GetRightCoor() const { return right_coor_; }
   double GetTopCoor() const { return top_coor_; }
@@ -104,4 +109,5 @@ class Camera {
 };
 
 inline size_t Camera::SAMPLES_PER_PIXEL = 10;
+inline Color Camera::EMPTY_COLOR = Color{0, 0, 0};
 #endif  // CAMERA_H
