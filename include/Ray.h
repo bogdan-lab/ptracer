@@ -18,13 +18,13 @@ class Ray {
   Ray(GeoVec&& pos, GeoVec&& dir)
       : pos_(std::move(pos)), dir_(std::move(dir.Norm())) {}
 
-  Ray& Advance(double dist) {
+  constexpr Ray& Advance(double dist) {
     assert(dist > 0);
     pos_ = pos_ + dist * dir_;
     return *this;
   }
 
-  Ray& StepBack(double dist) {
+  constexpr Ray& StepBack(double dist) {
     assert(dist > 0);
     pos_ = pos_ - dist * dir_;
     return *this;
@@ -36,8 +36,8 @@ class Ray {
     return *this;
   }
 
-  const GeoVec& GetPos() const { return pos_; }
-  const GeoVec& GetDir() const { return dir_; }
+  constexpr const GeoVec& GetPos() const { return pos_; }
+  constexpr const GeoVec& GetDir() const { return dir_; }
 };
 
 #endif  // RAY_H
