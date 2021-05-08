@@ -14,15 +14,6 @@ TEST(ColorTests, Creation) {
   EXPECT_EQ(c, res);
 }
 
-TEST(ColorTests, Writing) {
-  Color tst{1, 2, 3};
-  std::stringstream exp;
-  exp << "1 2 3";
-  std::stringstream res;
-  res << tst;
-  EXPECT_EQ(exp.str(), res.str());
-}
-
 TEST(ColorTests, Truncation) {
   {
     Color tr{0, 0, 0};
