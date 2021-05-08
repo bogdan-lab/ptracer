@@ -34,35 +34,37 @@ class Camera {
     SAMPLES_PER_PIXEL = g_num;
   }
 
-  static void SetEmptyColor(const Color& g_c) { EMPTY_COLOR = g_c; }
+  static constexpr void SetEmptyColor(Color g_c) {
+    EMPTY_COLOR = std::move(g_c);
+  }
 
-  Camera() = default;
+  constexpr Camera() = default;
 
-  Camera& SetLeftCoor(double g_coor) {
+  constexpr Camera& SetLeftCoor(double g_coor) {
     left_coor_ = g_coor;
     return *this;
   }
-  Camera& SetRightCoor(double g_coor) {
+  constexpr Camera& SetRightCoor(double g_coor) {
     right_coor_ = g_coor;
     return *this;
   }
-  Camera& SetTopCoor(double g_coor) {
+  constexpr Camera& SetTopCoor(double g_coor) {
     top_coor_ = g_coor;
     return *this;
   }
-  Camera& SetBotCoor(double g_coor) {
+  constexpr Camera& SetBotCoor(double g_coor) {
     bot_coor_ = g_coor;
     return *this;
   }
-  Camera& SetWidthInPixel(uint32_t g_num) {
+  constexpr Camera& SetWidthInPixel(uint32_t g_num) {
     w_px_num_ = g_num;
     return *this;
   }
-  Camera& SetHeightInPixel(uint32_t g_num) {
+  constexpr Camera& SetHeightInPixel(uint32_t g_num) {
     h_px_num_ = g_num;
     return *this;
   }
-  Camera& SetDistToPlane(double g_dist) {
+  constexpr Camera& SetDistToPlane(double g_dist) {
     dist_to_plane_ = g_dist;
     return *this;
   }
@@ -97,15 +99,15 @@ class Camera {
     return px_rays;
   }
 
-  static const Color& GetEmptyColor() { return EMPTY_COLOR; }
-  double GetLeftCoor() const { return left_coor_; }
-  double GetRightCoor() const { return right_coor_; }
-  double GetTopCoor() const { return top_coor_; }
-  double GetBotCoor() const { return bot_coor_; }
-  uint32_t GetWidthInPx() const { return w_px_num_; }
-  uint32_t GetHeightInPx() const { return h_px_num_; }
-  uint32_t GetPxNum() const { return w_px_num_ * h_px_num_; }
-  double GetDistToPlane() const { return dist_to_plane_; }
+  static constexpr const Color& GetEmptyColor() { return EMPTY_COLOR; }
+  constexpr double GetLeftCoor() const { return left_coor_; }
+  constexpr double GetRightCoor() const { return right_coor_; }
+  constexpr double GetTopCoor() const { return top_coor_; }
+  constexpr double GetBotCoor() const { return bot_coor_; }
+  constexpr uint32_t GetWidthInPx() const { return w_px_num_; }
+  constexpr uint32_t GetHeightInPx() const { return h_px_num_; }
+  constexpr uint32_t GetPxNum() const { return w_px_num_ * h_px_num_; }
+  constexpr double GetDistToPlane() const { return dist_to_plane_; }
 };
 
 inline size_t Camera::SAMPLES_PER_PIXEL = 10;

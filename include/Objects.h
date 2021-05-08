@@ -24,17 +24,17 @@ class Object {
   mutable std::mt19937 rnd_{0};
 
  public:
-  Object& SetColor(const Color& col) {
-    color_ = col;
+  constexpr Object& SetColor(Color col) {
+    color_ = std::move(col);
     return *this;
   }
 
-  Object& SetMaterial(Material g_mat) {
+  constexpr Object& SetMaterial(Material g_mat) {
     mat_ = g_mat;
     return *this;
   }
 
-  Object& SetHitPrecision(double prc) {
+  constexpr Object& SetHitPrecision(double prc) {
     hit_precision_ = prc;
     return *this;
   }
@@ -59,11 +59,11 @@ class Object {
     return *this;
   }
 
-  const Color& GetColor() const { return color_; }
-  Material GetMaterial() const { return mat_; }
-  double GetHitPrecision() const { return hit_precision_; }
-  double GetPolishness() const { return polishness_; }
-  double GetReflectionCoefficient() const { return refl_coef_; }
+  constexpr const Color& GetColor() const { return color_; }
+  constexpr Material GetMaterial() const { return mat_; }
+  constexpr double GetHitPrecision() const { return hit_precision_; }
+  constexpr double GetPolishness() const { return polishness_; }
+  constexpr double GetReflectionCoefficient() const { return refl_coef_; }
 
   GeoVec DoReflection(const GeoVec& dir, const GeoVec& norm) const {
     return HybridReflect(rnd_, polishness_, dir, norm);
@@ -93,7 +93,9 @@ class Sphere : public Object {
 
  public:
   Sphere() = delete;
-  Sphere(const GeoVec& gc, double gr) : center_(gc), r_(gr) { assert(r_ > 0); }
+  constexpr Sphere(const GeoVec& gc, double gr) : center_(gc), r_(gr) {
+    assert(r_ > 0);
+  }
 
   std::optional<double> GetClosesDist(const Ray& ray) const override;
 
@@ -123,7 +125,7 @@ class Triangle : public Object {
  public:
   Triangle() = delete;
   Triangle(const GeoVec& gp0, const GeoVec& gp1, const GeoVec& gp2)
-      : p0_(gp0), p1_(gp1), p2_(gp2), norm_(0, 0, 0) {
+      : p0_(gp0), p1_(gp1), p2_(gp2) {
     GeoVec lhs{p0_, p1_};
     GeoVec rhs{p0_, p2_};
     norm_ = lhs.Cross(rhs).Norm();
@@ -147,7 +149,7 @@ class Triangle : public Object {
     ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
   }
 
-  bool CheckInTriangle(const GeoVec& point) const {
+  constexpr bool CheckInTriangle(const GeoVec& point) const {
     // TODO looks like this can be improved if we use normalized triangle!
     // TODO assert that point is on the triangle surface!
     GeoVec to_p0{point, p0_};

@@ -4,13 +4,16 @@
 #include <assert.h>
 
 #include <cmath>
+#include <limits>
 
 struct GeoVec {
-  double x_, y_, z_;
+  double x_ = std::numeric_limits<double>::quiet_NaN();
+  double y_ = std::numeric_limits<double>::quiet_NaN();
+  double z_ = std::numeric_limits<double>::quiet_NaN();
 
-  GeoVec() = delete;
+  constexpr GeoVec() = default;
   constexpr GeoVec(double x, double y, double z) : x_(x), y_(y), z_(z) {}
-  GeoVec(const GeoVec& start, const GeoVec& end) {
+  constexpr GeoVec(const GeoVec& start, const GeoVec& end) {
     x_ = end.x_ - start.x_;
     y_ = end.y_ - start.y_;
     z_ = end.z_ - start.z_;

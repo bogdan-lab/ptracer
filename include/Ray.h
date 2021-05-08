@@ -11,11 +11,7 @@ class Ray {
 
  public:
   Ray() = delete;
-  Ray(const GeoVec& pos, const GeoVec& dir) : pos_(pos), dir_(dir) {
-    dir_.Norm();
-  }
-
-  Ray(GeoVec&& pos, GeoVec&& dir)
+  Ray(GeoVec pos, GeoVec dir)
       : pos_(std::move(pos)), dir_(std::move(dir.Norm())) {}
 
   constexpr Ray& Advance(double dist) {
