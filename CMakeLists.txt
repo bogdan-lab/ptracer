@@ -30,7 +30,7 @@ conan_cmake_run(REQUIRES
         BUILD missing)
 
 add_subdirectory(src)
-
+add_subdirectory(benchmarks)
 enable_testing()
 add_subdirectory(tests)
 

@@ -1,0 +1,3 @@
+﻿
+add_executable(bench_simple_scene SimpleSceneBenchmark.cpp)
+target_link_libraries(bench_simple_scene PRIVATE ptracer)
