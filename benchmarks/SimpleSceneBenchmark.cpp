@@ -8,6 +8,7 @@
 #include "Pixel.h"
 #include "PngWriter.h"
 #include "Scene.h"
+#include "benchmark_info.h"
 
 #define HIT_PRECISION 1e-9
 
@@ -16,7 +17,8 @@ class SimpleSceneBenchmark : public BenchmarkBase {
   Scene universe_;
 
  public:
-  SimpleSceneBenchmark() : BenchmarkBase("SimpleSceneBenchmark") {}
+  SimpleSceneBenchmark()
+      : BenchmarkBase(BENCHMARK_DIR_PATH, "SimpleSceneBenchmark") {}
 
   void CreateUniverse() override {
     double width = 600;
@@ -165,7 +167,7 @@ class SimpleSceneBenchmark : public BenchmarkBase {
 
   void MkPicture() override {
     Camera cam;
-    Camera::SetSamplePerPixel(4);
+    Camera::SetSamplePerPixel(400);
     Pixel::SetBounceLimit(1000);
     size_t px_num = cam.GetPxNum();
     std::vector<Color> col_vec;
@@ -176,7 +178,7 @@ class SimpleSceneBenchmark : public BenchmarkBase {
       if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
     }
 
-    std::string pic_name = GetBenchName() + ".png";
+    std::string pic_name = GetPath() + GetName() + std::string(".png");
     PngWriter pw{pic_name.c_str(), cam.GetWidthInPx(), cam.GetHeightInPx()};
     if (!pw.IsOk()) {
       throw std::runtime_error("Unable to save png file");
@@ -187,6 +189,9 @@ class SimpleSceneBenchmark : public BenchmarkBase {
 
 int main() {
   SimpleSceneBenchmark sp;
+  sp.SetGitBranch(CURRENT_GIT_BRANCH)
+      .SetGitCommit(CURRENT_GIT_COMMIT)
+      .SetCompilerInfo(COMPILER_INFO);
   sp.CreateUniverse();
   sp.MkPicture();
   return 0;
