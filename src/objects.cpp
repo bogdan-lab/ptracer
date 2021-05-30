@@ -1,4 +1,5 @@
 ﻿#include "Objects.h"
+
 #include <cmath>
 #include <optional>
 
@@ -22,7 +23,6 @@ std::optional<double> Triangle::GetClosesDist(const Ray& ray) const {
   if (den >= 0) return std::nullopt;  // ray is directed away!
   double num = ray_pos.Dot(norm_);
   double t = -(D_ + num) / den;
-  GeoVec cross_pt = ray_pos + t * ray_dir;
-  if (!CheckInTriangle(cross_pt)) return std::nullopt;
-  return dist_btw_points(ray_pos, cross_pt);
+  if (!CheckInTriangle(ray_pos + t * ray_dir)) return std::nullopt;
+  return t;
 }

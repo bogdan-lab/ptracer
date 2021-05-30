@@ -8,6 +8,7 @@
 
 #include "Color.h"
 #include "GeoVec.h"
+#include "Matrix.h"
 #include "Ray.h"
 #include "Reflector.h"
 
