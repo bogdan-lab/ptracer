@@ -49,10 +49,10 @@ class BenchmarkBase {
     std::ofstream fout{path_ + name_ + std::string(".txt"), std::ios_base::app};
     if (!fout.tellp()) {
       fout << "#Measure timestamp\tDuration, "
-              "s\tGitBranch\tGitCommit\tCompiler\n";
+              "ms\tGitBranch\tGitCommit\tCompiler\n";
     }
     fout << std::chrono::system_clock::to_time_t(start_) << '\t'
-         << std::chrono::duration_cast<std::chrono::seconds>(end_ - start_)
+         << std::chrono::duration_cast<std::chrono::milliseconds>(end_ - start_)
                 .count()
          << '\t' << git_branch_ << '\t' << git_commit_ << '\t' << compiler_
          << '\n';

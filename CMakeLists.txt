@@ -29,6 +29,12 @@ conan_cmake_run(REQUIRES
         OPTIONS BASIC_SETUP CMAKE_TARGETS
         BUILD missing)
 
+
+if(BENCHMARK)
+    add_compile_options(-fno-omit-frame-pointer)
+endif()
+
+
 add_subdirectory(src)
 add_subdirectory(benchmarks)
 enable_testing()

@@ -1,2 +1,2 @@
-#Measure timestamp	Duration, s	GitBranch	GitCommit	Compiler
-1621629949	185	master	55df195	GNU 9.3.0
+#Measure timestamp	Duration, ms	GitBranch	GitCommit	Compiler
+1622365498	189322	master	f12ba1e	GNU 9.3.0
