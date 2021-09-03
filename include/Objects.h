@@ -122,6 +122,7 @@ class Triangle : public Object {
   GeoVec p2_;
   GeoVec norm_;
   double D_;  // coefficient for plain Ax + By + Cz + D = 0
+  Matrix3x3 norm_operator_;
 
  public:
   Triangle() = delete;
@@ -131,6 +132,7 @@ class Triangle : public Object {
     GeoVec rhs{p0_, p2_};
     norm_ = lhs.Cross(rhs).Norm();
     D_ = -norm_.Dot(p0_);
+    norm_operator_ = GetReverse3x3(Matrix3x3{p0_, p1_, p2_});
   }
 
   std::optional<double> GetClosesDist(const Ray& ray) const override;
@@ -151,16 +153,11 @@ class Triangle : public Object {
   }
 
   constexpr bool CheckInTriangle(const GeoVec& point) const {
-    // TODO looks like this can be improved if we use normalized triangle!
     // TODO assert that point is on the triangle surface!
-    GeoVec to_p0{point, p0_};
-    GeoVec to_p1{point, p1_};
-    GeoVec to_p2{point, p2_};
-    GeoVec v0 = to_p0.Cross(to_p1);
-    GeoVec v1 = to_p1.Cross(to_p2);
-    GeoVec v2 = to_p2.Cross(to_p0);
-    if (v0.Dot(norm_) <= 0 || v1.Dot(norm_) <= 0 || v2.Dot(norm_) <= 0)
+    GeoVec norm_point = ApplyToVec(norm_operator_, point);
+    if (norm_point.x_ < 0 || norm_point.y_ < 0 || norm_point.z_ < 0) {
       return false;
+    }
     return true;
   }
 };

@@ -11,28 +11,28 @@ struct Matrix3x3 {
   GeoVec c2;
 };
 
-inline double Det2x2(double v00, double v01, double v10, double v11) {
+inline constexpr double Det2x2(double v00, double v01, double v10, double v11) {
   return v00 * v11 - v10 * v01;
 }
 
-inline double Det3x3(const Matrix3x3& m) {
+inline constexpr double Det3x3(const Matrix3x3& m) {
   return m.c0.x_ * Det2x2(m.c1.y_, m.c2.y_, m.c1.z_, m.c2.z_) -
          m.c1.x_ * Det2x2(m.c0.y_, m.c2.y_, m.c0.z_, m.c2.z_) +
          m.c2.x_ * Det2x2(m.c0.y_, m.c1.y_, m.c0.z_, m.c1.z_);
 }
 
-inline Matrix3x3 GetTranspose(const Matrix3x3& m) {
+inline constexpr Matrix3x3 GetTranspose(const Matrix3x3& m) {
   return {GeoVec{m.c0.x_, m.c1.x_, m.c2.x_}, GeoVec{m.c0.y_, m.c1.y_, m.c2.y_},
           GeoVec{m.c0.z_, m.c1.z_, m.c2.z_}};
 }
 
-inline GeoVec ApplyToVec(const Matrix3x3& m, const GeoVec& vec) {
+inline constexpr GeoVec ApplyToVec(const Matrix3x3& m, const GeoVec& vec) {
   return {vec.Dot({m.c0.x_, m.c1.x_, m.c2.x_}),
           vec.Dot({m.c0.y_, m.c1.y_, m.c2.y_}),
           vec.Dot({m.c0.z_, m.c1.z_, m.c2.z_})};
 }
 
-inline Matrix3x3 GetReverse3x3(const Matrix3x3& m) {
+inline constexpr Matrix3x3 GetReverse3x3(const Matrix3x3& m) {
   double det = Det3x3(m);
   Matrix3x3 tr = GetTranspose(m);
 
