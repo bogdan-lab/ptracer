@@ -50,4 +50,10 @@ inline constexpr Matrix3x3 GetReverse3x3(const Matrix3x3& m) {
   return {GeoVec{a00, a10, a20}, GeoVec{a01, a11, a21}, GeoVec{a02, a12, a22}};
 }
 
+inline constexpr Matrix3x3 operator*(const Matrix3x3& lhs,
+                                     const Matrix3x3& rhs) {
+  return {ApplyToVec(lhs, rhs.c0), ApplyToVec(lhs, rhs.c1),
+          ApplyToVec(lhs, rhs.c2)};
+}
+
 #endif  // MATRIX_H

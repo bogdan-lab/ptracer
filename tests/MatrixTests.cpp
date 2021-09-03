@@ -1,4 +1,7 @@
-﻿#include <gtest/gtest.h>
+﻿#include <gmock/gmock-matchers.h>
+#include <gmock/gmock-more-matchers.h>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "Matrix.h"
 
@@ -89,4 +92,56 @@ TEST(MatrixTests, ApplyToVec) {
   EXPECT_DOUBLE_EQ(res3.x_, exp3.x_);
   EXPECT_DOUBLE_EQ(res3.y_, exp3.y_);
   EXPECT_DOUBLE_EQ(res3.z_, exp3.z_);
+}
+
+TEST(MatrixTests, Multiply) {
+  {
+    Matrix3x3 lhs{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    Matrix3x3 rhs{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    Matrix3x3 res = lhs * rhs;
+    EXPECT_DOUBLE_EQ(res.c0.x_, 1);
+    EXPECT_DOUBLE_EQ(res.c0.y_, 2);
+    EXPECT_DOUBLE_EQ(res.c0.z_, 3);
+
+    EXPECT_DOUBLE_EQ(res.c1.x_, 4);
+    EXPECT_DOUBLE_EQ(res.c1.y_, 5);
+    EXPECT_DOUBLE_EQ(res.c1.z_, 6);
+
+    EXPECT_DOUBLE_EQ(res.c2.x_, 7);
+    EXPECT_DOUBLE_EQ(res.c2.y_, 8);
+    EXPECT_DOUBLE_EQ(res.c2.z_, 9);
+  }
+  {
+    Matrix3x3 lhs{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    Matrix3x3 rhs{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    Matrix3x3 res = rhs * lhs;
+    EXPECT_DOUBLE_EQ(res.c0.x_, 1);
+    EXPECT_DOUBLE_EQ(res.c0.y_, 2);
+    EXPECT_DOUBLE_EQ(res.c0.z_, 3);
+
+    EXPECT_DOUBLE_EQ(res.c1.x_, 4);
+    EXPECT_DOUBLE_EQ(res.c1.y_, 5);
+    EXPECT_DOUBLE_EQ(res.c1.z_, 6);
+
+    EXPECT_DOUBLE_EQ(res.c2.x_, 7);
+    EXPECT_DOUBLE_EQ(res.c2.y_, 8);
+    EXPECT_DOUBLE_EQ(res.c2.z_, 9);
+  }
+  {
+    Matrix3x3 lhs{{9, 2, 0}, {3, 0, 1}, {5, 3, -6}};
+    Matrix3x3 rhs{{1, -1, 8}, {-1, 4, 1}, {-1, 7, -1}};
+    Matrix3x3 res = lhs * rhs;
+
+    EXPECT_DOUBLE_EQ(res.c0.x_, 46);
+    EXPECT_DOUBLE_EQ(res.c0.y_, 26);
+    EXPECT_DOUBLE_EQ(res.c0.z_, -49);
+
+    EXPECT_DOUBLE_EQ(res.c1.x_, 8);
+    EXPECT_DOUBLE_EQ(res.c1.y_, 1);
+    EXPECT_DOUBLE_EQ(res.c1.z_, -2);
+
+    EXPECT_DOUBLE_EQ(res.c2.x_, 7);
+    EXPECT_DOUBLE_EQ(res.c2.y_, -5);
+    EXPECT_DOUBLE_EQ(res.c2.z_, 13);
+  }
 }

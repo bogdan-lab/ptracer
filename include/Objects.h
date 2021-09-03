@@ -124,6 +124,9 @@ class Triangle : public Object {
   double D_;  // coefficient for plain Ax + By + Cz + D = 0
   Matrix3x3 norm_operator_;
 
+  Matrix3x3 CalcNormOperator(const GeoVec& p0, const GeoVec& p1,
+                             const GeoVec& p2);
+
  public:
   Triangle() = delete;
   Triangle(const GeoVec& gp0, const GeoVec& gp1, const GeoVec& gp2)
@@ -132,7 +135,7 @@ class Triangle : public Object {
     GeoVec rhs{p0_, p2_};
     norm_ = lhs.Cross(rhs).Norm();
     D_ = -norm_.Dot(p0_);
-    norm_operator_ = GetReverse3x3(Matrix3x3{p0_, p1_, p2_});
+    norm_operator_ = CalcNormOperator(p0_, p1_, p2_);
   }
 
   std::optional<double> GetClosesDist(const Ray& ray) const override;

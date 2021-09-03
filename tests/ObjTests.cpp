@@ -131,6 +131,7 @@ TEST(TriangleTests, Creation) {
   }
 }
 
+// TODO need some checks where triangle is not parallel to the plane
 TEST(TriangleTests, CheckPointInTriangle) {
   Triangle tr{GeoVec{0, 0, 0}, GeoVec{0, 1, 0}, GeoVec{1, 0, 0}};
   {
