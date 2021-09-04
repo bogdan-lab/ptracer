@@ -115,6 +115,20 @@ class Sphere : public Object {
   }
 };
 
+struct Line {
+  double k;
+  double b;
+};
+
+struct InTriangleChecker {
+  Matrix3x3 conversion_matrix;
+  // arrays below contain modified points (in triangle basis and sheared)
+  std::array<GeoVec, 3> y_sorted;
+  std::array<GeoVec, 3> x_sorted;
+  Line y_min_mid;
+  Line y_mid_max;
+};
+
 class Triangle : public Object {
  private:
   GeoVec p0_;
@@ -122,10 +136,10 @@ class Triangle : public Object {
   GeoVec p2_;
   GeoVec norm_;
   double D_;  // coefficient for plain Ax + By + Cz + D = 0
-  Matrix3x3 norm_operator_;
+  InTriangleChecker checker_;
 
-  Matrix3x3 CalcNormOperator(const GeoVec& p0, const GeoVec& p1,
-                             const GeoVec& p2);
+  InTriangleChecker CalcInTriangleChecker(const GeoVec& p0, const GeoVec& p1,
+                                          const GeoVec& p2);
 
  public:
   Triangle() = delete;
@@ -135,7 +149,7 @@ class Triangle : public Object {
     GeoVec rhs{p0_, p2_};
     norm_ = lhs.Cross(rhs).Norm();
     D_ = -norm_.Dot(p0_);
-    norm_operator_ = CalcNormOperator(p0_, p1_, p2_);
+    checker_ = CalcInTriangleChecker(p0_, p1_, p2_);
   }
 
   std::optional<double> GetClosesDist(const Ray& ray) const override;
@@ -157,11 +171,20 @@ class Triangle : public Object {
 
   constexpr bool CheckInTriangle(const GeoVec& point) const {
     // TODO assert that point is on the triangle surface!
-    GeoVec norm_point = ApplyToVec(norm_operator_, point);
-    if (norm_point.x_ < 0 || norm_point.y_ < 0 || norm_point.z_ < 0) {
+    GeoVec norm_point = ApplyToVec(checker_.conversion_matrix, point);
+    if (norm_point.x_ < checker_.x_sorted[0].x_ ||
+        norm_point.x_ > checker_.x_sorted[2].x_ ||
+        norm_point.y_ < checker_.y_sorted[0].y_ ||
+        norm_point.y_ < checker_.y_sorted[2].y_) {
       return false;
     }
-    return true;
+    if (norm_point.y_ < checker_.y_sorted[1].y_) {
+      return checker_.y_min_mid.k * norm_point.x_ + checker_.y_min_mid.b <
+             norm_point.y_;
+    } else {
+      return checker_.y_mid_max.k * norm_point.x_ + checker_.y_mid_max.b >
+             norm_point.y_;
+    }
   }
 };
 

@@ -132,8 +132,9 @@ TEST(TriangleTests, Creation) {
 }
 
 // TODO need some checks where triangle is not parallel to the plane
+// TODO check with point (0,0,0)!
 TEST(TriangleTests, CheckPointInTriangle) {
-  Triangle tr{GeoVec{0, 0, 0}, GeoVec{0, 1, 0}, GeoVec{1, 0, 0}};
+  Triangle tr{GeoVec{0.1, 0.1, 0}, GeoVec{0, 1, 0}, GeoVec{1, 0, 0}};
   {
     GeoVec p{0.25, 0.25, 0};
     EXPECT_TRUE(tr.CheckInTriangle(p));
