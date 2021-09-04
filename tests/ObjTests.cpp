@@ -131,29 +131,29 @@ TEST(TriangleTests, Creation) {
   }
 }
 
-// TODO need some checks where triangle is not parallel to the plane
-// TODO check with point (0,0,0)!
 TEST(TriangleTests, CheckPointInTriangle) {
-  Triangle tr{GeoVec{0.1, 0.1, 0}, GeoVec{0, 1, 0}, GeoVec{1, 0, 0}};
-  {
-    GeoVec p{0.25, 0.25, 0};
-    EXPECT_TRUE(tr.CheckInTriangle(p));
+  {  // in plane z = 0
+    Triangle tr{{0, 0, 0}, {0, 1, 0}, {1, 0, 0}};
+    EXPECT_TRUE(tr.CheckInTriangle({0.25, 0.25, 0}));
+    EXPECT_FALSE(tr.CheckInTriangle({1.5, 0.25, 0}));
+    EXPECT_FALSE(tr.CheckInTriangle({0.25, 1.5, 0}));
+    EXPECT_FALSE(tr.CheckInTriangle({-0.25, 0.25, 0}));
+    EXPECT_FALSE(tr.CheckInTriangle({0.25, -0.25, 0}));
   }
-  {
-    GeoVec p{1.5, 0.25, 0};
-    EXPECT_FALSE(tr.CheckInTriangle(p));
+  {  // in plane x = 10
+    Triangle tr{{10, 0, 0}, {10, 1, 0}, {10, 0, 1}};
+    EXPECT_TRUE(tr.CheckInTriangle({10, 0.25, 0.25}));
+    EXPECT_FALSE(tr.CheckInTriangle({10, 1.25, 0.25}));
+    EXPECT_FALSE(tr.CheckInTriangle({10, 1.25, -0.25}));
+    EXPECT_FALSE(tr.CheckInTriangle({10, -1.25, -1.25}));
+    EXPECT_FALSE(tr.CheckInTriangle({10, 1.25, 1.25}));
   }
-  {
-    GeoVec p{0.25, 1.5, 0};
-    EXPECT_FALSE(tr.CheckInTriangle(p));
-  }
-  {
-    GeoVec p{-0.25, 0.25, 0};
-    EXPECT_FALSE(tr.CheckInTriangle(p));
-  }
-  {
-    GeoVec p{0.25, -0.25, 0};
-    EXPECT_FALSE(tr.CheckInTriangle(p));
+  {  // in plane not parallel to standart plane
+    Triangle tr{{0, 0, 0}, {1, 1, -1}, {0, 0, 1}};
+    EXPECT_TRUE(tr.CheckInTriangle({0.25, 0.25, 0.25}));
+    EXPECT_FALSE(tr.CheckInTriangle({0.25, 0.25, -0.7}));
+    EXPECT_FALSE(tr.CheckInTriangle({0.25, 0.25, 0.7}));
+    EXPECT_FALSE(tr.CheckInTriangle({-0.25, -0.25, 0.0}));
   }
 }
 

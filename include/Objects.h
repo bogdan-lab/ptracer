@@ -175,7 +175,7 @@ class Triangle : public Object {
     if (norm_point.x_ < checker_.x_sorted[0].x_ ||
         norm_point.x_ > checker_.x_sorted[2].x_ ||
         norm_point.y_ < checker_.y_sorted[0].y_ ||
-        norm_point.y_ < checker_.y_sorted[2].y_) {
+        norm_point.y_ > checker_.y_sorted[2].y_) {
       return false;
     }
     if (norm_point.y_ < checker_.y_sorted[1].y_) {
