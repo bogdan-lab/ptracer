@@ -98,7 +98,17 @@ class Sphere : public Object {
     assert(r_ > 0);
   }
 
-  std::optional<double> GetClosesDist(const Ray& ray) const override;
+  std::optional<double> GetClosesDist(const Ray& ray) const override {
+    GeoVec ray_to_c{ray.GetPos(), center_};
+    double dist_to_c = ray_to_c.Len();
+    assert(dist_to_c > r_);  // should not be inside sphere
+    double dist_proj = ray_to_c.Dot(ray.GetDir());
+    if (dist_proj <= 0) return std::nullopt;  // ray directed away!
+    double D_quarter = dist_proj * dist_proj - dist_to_c * dist_to_c + r_ * r_;
+    if (D_quarter <= 0)
+      return std::nullopt;  //==0 - ignore when ray only touch the surface
+    return dist_proj - std::sqrt(D_quarter);
+  }
 
   GeoVec GetNorm(const GeoVec& p) const override { return (p - center_) / r_; }
 
@@ -152,7 +162,16 @@ class Triangle : public Object {
     checker_ = CalcInTriangleChecker(p0_, p1_, p2_);
   }
 
-  std::optional<double> GetClosesDist(const Ray& ray) const override;
+  std::optional<double> GetClosesDist(const Ray& ray) const override {
+    // find ray crossection with the plain
+    const auto& ray_dir = ray.GetDir();
+    const auto& ray_pos = ray.GetPos();
+    double den = ray_dir.Dot(norm_);
+    if (den >= 0) return std::nullopt;  // ray is directed away!
+    double t = -(D_ + ray_pos.Dot(norm_)) / den;
+    if (!CheckInTriangle(ray_pos + t * ray_dir)) return std::nullopt;
+    return t;
+  }
 
   GeoVec GetNorm(const GeoVec& /*p*/) const override { return norm_; }
 
@@ -171,7 +190,7 @@ class Triangle : public Object {
 
   constexpr bool CheckInTriangle(const GeoVec& point) const {
     assert(std::abs(Det3x3({GeoVec{p0_, p1_}, GeoVec{p0_, p2_},
-                            GeoVec{p0_, point}})) < hit_precision_);
+                            GeoVec{p0_, point}})) < GetHitPrecision());
     double norm_x = TransformXCoor(checker_.conversion_matrix, point);
     double norm_y = TransformYCoor(checker_.conversion_matrix, point);
     if (norm_x < checker_.x_sorted[0].x_ || norm_x > checker_.x_sorted[2].x_ ||
