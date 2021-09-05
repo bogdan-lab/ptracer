@@ -22,8 +22,7 @@ std::optional<double> Triangle::GetClosesDist(const Ray& ray) const {
   const auto& ray_pos = ray.GetPos();
   double den = ray_dir.Dot(norm_);
   if (den >= 0) return std::nullopt;  // ray is directed away!
-  double num = ray_pos.Dot(norm_);
-  double t = -(D_ + num) / den;
+  double t = -(D_ + ray_pos.Dot(norm_)) / den;
   if (!CheckInTriangle(ray_pos + t * ray_dir)) return std::nullopt;
   return t;
 }

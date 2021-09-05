@@ -170,20 +170,18 @@ class Triangle : public Object {
   }
 
   constexpr bool CheckInTriangle(const GeoVec& point) const {
-    // TODO assert that point is on the triangle surface!
-    GeoVec norm_point = ApplyToVec(checker_.conversion_matrix, point);
-    if (norm_point.x_ < checker_.x_sorted[0].x_ ||
-        norm_point.x_ > checker_.x_sorted[2].x_ ||
-        norm_point.y_ < checker_.y_sorted[0].y_ ||
-        norm_point.y_ > checker_.y_sorted[2].y_) {
+    assert(std::abs(Det3x3({GeoVec{p0_, p1_}, GeoVec{p0_, p2_},
+                            GeoVec{p0_, point}})) < hit_precision_);
+    double norm_x = TransformXCoor(checker_.conversion_matrix, point);
+    double norm_y = TransformYCoor(checker_.conversion_matrix, point);
+    if (norm_x < checker_.x_sorted[0].x_ || norm_x > checker_.x_sorted[2].x_ ||
+        norm_y < checker_.y_sorted[0].y_ || norm_y > checker_.y_sorted[2].y_) {
       return false;
     }
-    if (norm_point.y_ < checker_.y_sorted[1].y_) {
-      return checker_.y_min_mid.k * norm_point.x_ + checker_.y_min_mid.b <
-             norm_point.y_;
+    if (norm_y < checker_.y_sorted[1].y_) {
+      return checker_.y_min_mid.k * norm_x + checker_.y_min_mid.b < norm_y;
     } else {
-      return checker_.y_mid_max.k * norm_point.x_ + checker_.y_mid_max.b >
-             norm_point.y_;
+      return checker_.y_mid_max.k * norm_x + checker_.y_mid_max.b > norm_y;
     }
   }
 };

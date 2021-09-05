@@ -26,10 +26,21 @@ inline constexpr Matrix3x3 GetTranspose(const Matrix3x3& m) {
           GeoVec{m.c0.z_, m.c1.z_, m.c2.z_}};
 }
 
+inline constexpr double TransformXCoor(const Matrix3x3& m, const GeoVec& vec) {
+  return vec.Dot({m.c0.x_, m.c1.x_, m.c2.x_});
+}
+
+inline constexpr double TransformYCoor(const Matrix3x3& m, const GeoVec& vec) {
+  return vec.Dot({m.c0.y_, m.c1.y_, m.c2.y_});
+}
+
+inline constexpr double TransformZCoor(const Matrix3x3& m, const GeoVec& vec) {
+  return vec.Dot({m.c0.z_, m.c1.z_, m.c2.z_});
+}
+
 inline constexpr GeoVec ApplyToVec(const Matrix3x3& m, const GeoVec& vec) {
-  return {vec.Dot({m.c0.x_, m.c1.x_, m.c2.x_}),
-          vec.Dot({m.c0.y_, m.c1.y_, m.c2.y_}),
-          vec.Dot({m.c0.z_, m.c1.z_, m.c2.z_})};
+  return {TransformXCoor(m, vec), TransformYCoor(m, vec),
+          TransformZCoor(m, vec)};
 }
 
 inline constexpr Matrix3x3 GetReverse3x3(const Matrix3x3& m) {
