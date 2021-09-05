@@ -3,3 +3,7 @@
 1630753522	174404	optimizing_check_in_triangle	7a5b1d9	GNU 9.3.0
 1630753717	167570	optimizing_check_in_triangle	7a5b1d9	GNU 9.3.0
 1630753894	167846	optimizing_check_in_triangle	7a5b1d9	GNU 9.3.0
+1630835902	168322	optimizing_check_in_triangle	cbcd6dc	GNU 9.3.0
+1630836092	170631	optimizing_check_in_triangle	cbcd6dc	GNU 9.3.0
+1630836267	166572	optimizing_check_in_triangle	cbcd6dc	GNU 9.3.0
+1630836440	166481	optimizing_check_in_triangle	cbcd6dc	GNU 9.3.0
