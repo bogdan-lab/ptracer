@@ -45,11 +45,10 @@ class Camera {
  public:
   /**
    * Sets number of rays which will be emitted for each pixel in order to
-   * calculate its color (default 10)
+   * calculate its color (default 10). Zero cannot be set
    */
   static void SetSamplePerPixel(size_t g_num) {
-    assert(g_num != 0);
-    SAMPLES_PER_PIXEL = g_num;
+    if (g_num) SAMPLES_PER_PIXEL = g_num;
   }
   /**
    * Sets background color - the one which will be assigned to pixel for which
@@ -87,14 +86,16 @@ class Camera {
     bot_coor_ = g_coor;
     return *this;
   }
-  /** Set number of pixels in picture in horizontal direction (default 600)*/
+  /** Set number of pixels in picture in horizontal direction (default 600)
+   * Zero cannot be set.*/
   constexpr Camera& SetWidthInPixel(uint32_t g_num) {
-    w_px_num_ = g_num;
+    if (g_num) w_px_num_ = g_num;
     return *this;
   }
-  /** Set number of pixels in picture in vertical direction (default 400)*/
+  /** Set number of pixels in picture in vertical direction (default 400)
+   * Zero cannot be set.*/
   constexpr Camera& SetHeightInPixel(uint32_t g_num) {
-    h_px_num_ = g_num;
+    if (g_num) h_px_num_ = g_num;
     return *this;
   }
   /** Set distance from camera to the picture plane (default 500)*/
@@ -104,7 +105,7 @@ class Camera {
   }
   /**
    * For generating rays camera uses random generator. This method allows to
-   * provide seed for this generator
+   * provide seed for this generator (default 0)
    */
   Camera& SetSeed(size_t new_s) {
     rnd_.seed(new_s);
@@ -116,8 +117,8 @@ class Camera {
    * @param idx - pixel idx on the screen. Assume that pixels are counted from
    * the top left corner to the right
    *
-   * @warning method expects pixel index to have valid value and also that all
-   * parameters of picture (coordinates, pixels number) also have valid values
+   * @warning method expects pixel index to have valid value and so do picture
+   * coordinates
    *
    * @return collection of rays for given pixes which needs to be emitted n
    * order to calculate its color
@@ -126,8 +127,6 @@ class Camera {
     assert(idx < GetPxNum());
     assert(right_coor_ > left_coor_);
     assert(top_coor_ < bot_coor_);
-    assert(w_px_num_ != 0);
-    assert(h_px_num_ != 0);
     double dx = (right_coor_ - left_coor_) / static_cast<double>(w_px_num_);
     double dy = (bot_coor_ - top_coor_) / static_cast<double>(h_px_num_);
     double l_bnd = left_coor_ + static_cast<double>(idx % w_px_num_) * dx;

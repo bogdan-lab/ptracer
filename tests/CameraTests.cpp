@@ -2,42 +2,19 @@
 #include <gtest/gtest.h>
 
 TEST(CameraTests, Creation) {
+  Camera cam;
 #ifndef NDEBUG
-  {
-    Camera cam;
-    cam.SetLeftCoor(100).SetRightCoor(0);
-    EXPECT_DEATH(cam.GetPixelRays(0), "");
-  }
-  {
-    Camera cam;
-    cam.SetBotCoor(0).SetTopCoor(100);
-    EXPECT_DEATH(cam.GetPixelRays(0), "");
-  }
-  {
-    Camera cam;
-    cam.SetWidthInPixel(0);
-    EXPECT_DEATH(cam.GetPixelRays(0), "");
-  }
-  {
-    Camera cam;
-    cam.SetHeightInPixel(0);
-    EXPECT_DEATH(cam.GetPixelRays(0), "");
-  }
-  {
-    Camera cam;
-    EXPECT_DEATH(cam.GetPixelRays(std::numeric_limits<size_t>::max()), "");
-  }
-  {
-    Camera cam;
-    EXPECT_DEATH(Camera::SetSamplePerPixel(0), "");
-  }
+  EXPECT_DEATH(cam.SetLeftCoor(100).SetRightCoor(0).GetPixelRays(0), "");
+  EXPECT_DEATH(cam.SetBotCoor(0).SetTopCoor(100).GetPixelRays(0), "");
+  EXPECT_DEATH(cam.GetPixelRays(std::numeric_limits<size_t>::max()), "");
 #endif
-  {
-    Camera cam;
-    cam.SetSamplePerPixel(23);
-    auto res = cam.GetPixelRays(0);
-    EXPECT_EQ(res.size(), 23);
-  }
+  // Camera cam;
+  cam.SetSamplePerPixel(23);
+  EXPECT_EQ(cam.GetPixelRays(0).size(), 23);
+  cam.SetSamplePerPixel(0);
+  EXPECT_EQ(cam.GetPixelRays(0).size(), 23);
+  EXPECT_EQ(cam.SetWidthInPixel(0).GetWidthInPx(), 600);
+  EXPECT_EQ(cam.SetHeightInPixel(0).GetHeightInPx(), 400);
 }
 
 TEST(CameraTests, CreatePixel) {
