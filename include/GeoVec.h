@@ -1,4 +1,8 @@
-﻿#ifndef GEO_VEC_H
+﻿/**
+ * @file GeoVec.h
+ * Contain utilities to work with geometrical vector
+ */
+#ifndef GEO_VEC_H
 #define GEO_VEC_H
 
 #include <assert.h>
