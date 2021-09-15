@@ -15,6 +15,7 @@
 // TODO here is an opportunity to add kRefractive material
 enum class Material { kNoMaterial = 0, kReflective, kLightSource };
 
+/** Interface object class*/
 class Object {
  private:
   double polishness_ = 0.0;
@@ -39,14 +40,18 @@ class Object {
     hit_precision_ = prc;
     return *this;
   }
-
+  /**
+   * Sets degree of the polishness. Its value should be in the range [0, 1]
+   * Where 0 - not polished - all reflections are random
+   * 1 - mirror like polished
+   */
   Object& SetPolishness(double g_pol) {
     if (g_pol < 0 || g_pol > 1)
       throw std::logic_error("Incorrect polishnaess value. Should be in [0,1]");
     polishness_ = g_pol;
     return *this;
   }
-
+  /** Reflection coefficient should be in range [0, 1]*/
   Object& SetReflectionCoef(double g_r) {
     if (g_r < 0 || g_r > 1)
       throw std::logic_error(
@@ -65,11 +70,22 @@ class Object {
   constexpr double GetHitPrecision() const { return hit_precision_; }
   constexpr double GetPolishness() const { return polishness_; }
   constexpr double GetReflectionCoefficient() const { return refl_coef_; }
-
+  // TODO DoReflection should be protected ?
+  /** Performes reflecion based on the object polishness*/
   GeoVec DoReflection(const GeoVec& dir, const GeoVec& norm) const {
     return HybridReflect(rnd_, polishness_, dir, norm);
   }
-
+  // TODO maybe it will be more effective to roll for reflection before
+  // calculating distance ?
+  /**
+   * Method desides whether ray will be reflected or not based on the object
+   * reflection coefficient
+   * @param ray - in/out incident ray. If reflection happened will contain new
+   * direction and new ray position.
+   * @param dist - distance from the current point to the reflective surface
+   *
+   * @return true - if reflection happened, false - otherwise
+   */
   bool TryReflect(Ray& ray, double dist) {
     assert(refl_coef_ >= 0);
     assert(refl_coef_ <= 1);
@@ -80,9 +96,23 @@ class Object {
     }
     return false;
   }
-
+  /**
+   * Returnes minimal distance from the given ray to this object. If ray does
+   * not cross this object nullopt is returned
+   */
   virtual std::optional<double> GetClosesDist(const Ray& ray) const = 0;
+  /**
+   * Returns this object normal in the given point. All normals point to the
+   * direction of surface reflection
+   */
   virtual GeoVec GetNorm(const GeoVec& p) const = 0;
+  // TODO Reflect method does not reflect anything - change name, maybe move to
+  // the base class ?
+  /**
+   * This method conrain object specific lojic required for performing
+   * reflection also it moves ray to the given dist and make sure it have not
+   * left scene borders
+   */
   virtual void Reflect(Ray& ray, double dist) const = 0;
   virtual ~Object() = default;
 };
@@ -124,18 +154,31 @@ class Sphere : public Object {
     ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
   }
 };
-
+/** Struct for representing line like y = k*x + b*/
 struct Line {
   double k;
   double b;
 };
-
+/**
+ * Utlitiy struct for more effective check whether point is in triangle or not.
+ */
 struct InTriangleChecker {
+  /**
+   * Matrix for changing basis from original to triangle. All other fields
+   * coordinates are in triangle basis.
+   * Triangle basis is the one where z coordinate is 0 for all 3 points in
+   * current triangle
+   */
   Matrix3x3 conversion_matrix;
-  // arrays below contain modified points (in triangle basis and sheared)
+  /** Current triangle coordinates in triangle basis sorted acording to y
+   * coordinate*/
   std::array<GeoVec, 3> y_sorted;
+  /** Current triangle coordinates in triangle basis sorted acording to x
+   * coordinate*/
   std::array<GeoVec, 3> x_sorted;
+  /** Equation for line connecting y_min and y_mid points from y_sorted*/
   Line y_min_mid;
+  /** Equation for line connecting y_mid and y_max points from y_sorted*/
   Line y_mid_max;
 };
 
@@ -147,7 +190,8 @@ class Triangle : public Object {
   GeoVec norm_;
   double D_;  // coefficient for plain Ax + By + Cz + D = 0
   InTriangleChecker checker_;
-
+  /** Method which prepares checker struct for effective check ehether point are
+   * inside the triangle or not*/
   InTriangleChecker CalcInTriangleChecker(const GeoVec& p0, const GeoVec& p1,
                                           const GeoVec& p2);
 
@@ -187,7 +231,7 @@ class Triangle : public Object {
     }
     ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
   }
-
+  /** @return true if point is in triangle, false - otherwise*/
   constexpr bool CheckInTriangle(const GeoVec& point) const {
     assert(std::abs(Det3x3({GeoVec{p0_, p1_}, GeoVec{p0_, p2_},
                             GeoVec{p0_, point}})) < GetHitPrecision());
