@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Color.h"
-
+/** Simple wrapper for saving png images*/
 class PngWriter {
   std::unique_ptr<FILE, decltype(fclose) *> file_;
   png_structp png_struct_{};

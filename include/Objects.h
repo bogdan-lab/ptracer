@@ -14,7 +14,8 @@
 
 // TODO here is an opportunity to add kRefractive material
 enum class Material { kNoMaterial = 0, kReflective, kLightSource };
-
+// TODO Can I make object interface in template way or something ? In order to
+// avoid vtbl
 /** Interface object class*/
 class Object {
  private:
