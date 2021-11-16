@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <limits>
+#include <vector>
 
 // TODO make is_color_field - enum
 
@@ -26,6 +27,40 @@ struct Color {
    * By default empty color is created
    */
   constexpr Color() = default;
+
+  /** Method calculates average color based on given collection of colors.*/
+  static Color GetAverageColor(const std::vector<Color>& colors) {
+    int64_t r = 0;
+    int64_t g = 0;
+    int64_t b = 0;
+    int64_t col_num = 0;
+    for (const auto& el : colors) {
+      if (el.IsColor()) {
+        r += el.red_;
+        g += el.green_;
+        b += el.blue_;
+        col_num++;
+      }
+    }
+    if (!col_num) return Color{0, 0, 0};
+    return {r / col_num, g / col_num, b / col_num};
+  }
+  /**
+   * Light we see is reflection of the light from source.
+   * if in light in source red == 0 there could be no red in reflection!
+   * The same stays for the reflected light
+   * Last note in colors is expected to be light source color -> trunc all
+   * colors starting from the end to the beginning
+   * Procedure should be preformed inside one ray trace
+   */
+  static void TruncColorsInTrace(std::vector<Color>& colors) {
+    if (colors.empty()) return;
+    auto it_source = colors.rbegin();
+    for (auto it = std::next(it_source); it != colors.rend();
+         ++it, ++it_source) {
+      it->TruncByColor(*it_source);
+    }
+  }
   // TODO do I really need this clamping ???
   /**
    * Creates color based on RGB arguments.

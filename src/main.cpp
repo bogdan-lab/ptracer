@@ -165,14 +165,13 @@ int main() {
   Camera cam;
   // cam.SetWidthInPixel(1200).SetHeightInPixel(800);
   Camera::SetSamplePerPixel(400);
-  Pixel::SetBounceLimit(1000);
 
   size_t px_num = cam.GetPxNum();
   std::vector<Color> col_vec;
   col_vec.reserve(px_num);
-  Pixel gen_px;
   for (size_t i = 0; i < px_num; i++) {
-    col_vec.push_back(gen_px.TraceRays(cam.GetPixelRays(i), universe));
+    col_vec.push_back(pixel::TraceRays(cam.GetPixelRays(i), universe,
+                                       /*bounce_limit=*/1000));
     if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
   }
 

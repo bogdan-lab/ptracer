@@ -1,12 +1,14 @@
 ﻿#include "Pixel.h"
 
-Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
+Color pixel::RenderRay(const Ray& ray, const Scene& universe,
+                       size_t bounce_limit) {
+  if (bounce_limit == 0) return colors::kBlack;
   std::vector<Color> bounce_colors;
-  bounce_colors.reserve(BOUNCE_LIMIT);
+  bounce_colors.reserve(bounce_limit);
   Ray curr_ray = ray;
   const auto& all_objects = universe.GetObjects();
   BounceRecord bc_rec;
-  for (size_t curr_bnc = 0; curr_bnc < BOUNCE_LIMIT - 1; curr_bnc++) {
+  for (size_t curr_bnc = 0; curr_bnc < bounce_limit - 1; curr_bnc++) {
     // should take into account all trace ONLY if eventually it hits light
     // source! so check that last hit separately
     bc_rec = MakeRayBounce(curr_ray, all_objects);
@@ -15,8 +17,8 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
         return Camera::GetEmptyColor();
       case Material::kLightSource:
         bounce_colors.push_back(bc_rec.hit_obj_color_);
-        TruncColorsInTrace(bounce_colors);
-        return GetAverageColor(bounce_colors);
+        Color::TruncColorsInTrace(bounce_colors);
+        return Color::GetAverageColor(bounce_colors);
       case Material::kReflective:
         bounce_colors.push_back(bc_rec.hit_obj_color_);
         break;
@@ -29,12 +31,12 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
     return Camera::GetEmptyColor();
   }
   bounce_colors.push_back(bc_rec.hit_obj_color_);
-  TruncColorsInTrace(bounce_colors);
-  return GetAverageColor(bounce_colors);
+  Color::TruncColorsInTrace(bounce_colors);
+  return Color::GetAverageColor(bounce_colors);
 }
 
-BounceRecord Pixel::MakeRayBounce(Ray& ray,
-                                  const ObjectCollection& all_objects) const {
+BounceRecord pixel::MakeRayBounce(Ray& ray,
+                                  const ObjectCollection& all_objects) {
   std::optional<double> dist = std::nullopt;
   size_t obj_idx = 0;
   double min_dist = std::numeric_limits<double>::max();
@@ -48,7 +50,7 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
   }
   if (min_dist == std::numeric_limits<double>::max()) {
     // hit nothing
-    return {Material::kNoMaterial, Color{}};
+    return {Material::kNoMaterial, colors::kNoColor};
   }
   const auto& hit_obj = all_objects[obj_idx];
   switch (hit_obj->GetMaterial()) {
@@ -56,7 +58,7 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
       break;
     case Material::kReflective: {
       bool success = hit_obj->TryReflect(ray, min_dist);
-      if (!success) return {Material::kNoMaterial, Color{}};
+      if (!success) return {Material::kNoMaterial, colors::kNoColor};
       break;
     }
     default:
