@@ -10,12 +10,12 @@
 #include "Objects.h"
 #include "Ray.h"
 #include "Scene.h"
-// TODO Color has empty state - does not need to have optional here ?
+
 /** Struct contains information about material and color of an object which was
  * hit by ray*/
 struct BounceRecord {
   Material hit_obj_mat_;
-  std::optional<Color> hit_obj_color_;
+  Color hit_obj_color_;
 };
 // TODO Pixel does not have to be class!
 class Pixel {

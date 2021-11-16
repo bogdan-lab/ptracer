@@ -14,11 +14,11 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
       case Material::kNoMaterial:
         return Camera::GetEmptyColor();
       case Material::kLightSource:
-        bounce_colors.push_back(*bc_rec.hit_obj_color_);
+        bounce_colors.push_back(bc_rec.hit_obj_color_);
         TruncColorsInTrace(bounce_colors);
         return GetAverageColor(bounce_colors);
       case Material::kReflective:
-        bounce_colors.push_back(*bc_rec.hit_obj_color_);
+        bounce_colors.push_back(bc_rec.hit_obj_color_);
         break;
       default:
         throw std::logic_error("Met unknown material in RenderRay()");
@@ -28,7 +28,7 @@ Color Pixel::RenderRay(const Ray& ray, const Scene& universe) const {
   if (bc_rec.hit_obj_mat_ != Material::kLightSource) {
     return Camera::GetEmptyColor();
   }
-  bounce_colors.push_back(*bc_rec.hit_obj_color_);
+  bounce_colors.push_back(bc_rec.hit_obj_color_);
   TruncColorsInTrace(bounce_colors);
   return GetAverageColor(bounce_colors);
 }
@@ -48,7 +48,7 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
   }
   if (min_dist == std::numeric_limits<double>::max()) {
     // hit nothing
-    return {Material::kNoMaterial, std::nullopt};
+    return {Material::kNoMaterial, Color{}};
   }
   const auto& hit_obj = all_objects[obj_idx];
   switch (hit_obj->GetMaterial()) {
@@ -56,7 +56,7 @@ BounceRecord Pixel::MakeRayBounce(Ray& ray,
       break;
     case Material::kReflective: {
       bool success = hit_obj->TryReflect(ray, min_dist);
-      if (!success) return {Material::kNoMaterial, std::nullopt};
+      if (!success) return {Material::kNoMaterial, Color{}};
       break;
     }
     default:
