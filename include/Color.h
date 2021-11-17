@@ -10,7 +10,7 @@
 #include <limits>
 #include <vector>
 
-// TODO make is_color_field - enum
+enum class ColorValidity : uint8_t { kYes, kNo };
 
 /**
  * Struct represents single color.
@@ -21,7 +21,7 @@ struct Color {
   uint8_t green_ = 0;
   uint8_t blue_ = 0;
   /** Can have only values 1 - valid color is stored, 0 - color is empty*/
-  uint8_t is_color_ = 0;
+  ColorValidity is_color_ = ColorValidity::kNo;
 
   /**
    * By default empty color is created
@@ -61,22 +61,21 @@ struct Color {
       it->TruncByColor(*it_source);
     }
   }
-  // TODO do I really need this clamping ???
   /**
    * Creates color based on RGB arguments.
    * passed arguments are clamped from 0 to 255 during creation
    */
-  constexpr Color(int64_t R, int64_t G, int64_t B) : is_color_(1) {
+  constexpr Color(int64_t R, int64_t G, int64_t B)
+      : is_color_(ColorValidity::kYes) {
     red_ = ColorClamp(R);
     green_ = ColorClamp(G);
     blue_ = ColorClamp(B);
   }
 
-  // TODO why is not it static ?
   /**
    * Clamps given val between 0 and 255 and converts it to uint8_t
    */
-  constexpr uint8_t ColorClamp(int64_t val) noexcept {
+  static constexpr uint8_t ColorClamp(int64_t val) noexcept {
     auto high = std::numeric_limits<uint8_t>::max();
     auto low = std::numeric_limits<uint8_t>::min();
     return static_cast<uint8_t>(val >= high ? high : (val <= low ? low : val));
@@ -93,7 +92,7 @@ struct Color {
     if (blue_ > tr_col.blue_) blue_ = tr_col.blue_;
   }
   /** Checks if current color is empty*/
-  constexpr bool IsColor() const { return is_color_ == 1; }
+  constexpr bool IsColor() const { return is_color_ == ColorValidity::kYes; }
 };
 
 inline constexpr bool operator==(const Color& lhs, const Color& rhs) {
