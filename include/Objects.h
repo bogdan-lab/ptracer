@@ -66,7 +66,8 @@ class Object {
 
   /**
    * Method decides whether ray will be reflected or not based on the object
-   * reflection coefficient
+   * reflection coefficient. If reflection happens, method will move and turn
+   * the ray
    * @param ray - in/out incident ray. If reflection happened will contain new
    * direction and new ray position.
    * @param dist - distance from the current point to the reflective surface
