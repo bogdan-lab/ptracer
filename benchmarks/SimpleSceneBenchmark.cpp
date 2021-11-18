@@ -10,8 +10,6 @@
 #include "Scene.h"
 #include "benchmark_info.h"
 
-#define HIT_PRECISION 1e-9
-
 class SimpleSceneBenchmark : public BenchmarkBase {
  private:
   Scene universe_;
@@ -40,7 +38,6 @@ class SimpleSceneBenchmark : public BenchmarkBase {
         GeoVec{width / 2, height - sph_radius, depth / 2}, sph_radius);
     sphere->SetColor(colors::kBlue)
         .SetMaterial(Material::kReflective)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.1)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(sphere));
@@ -50,7 +47,6 @@ class SimpleSceneBenchmark : public BenchmarkBase {
         sph_radius);
     sphere->SetColor(colors::kNoColor)
         .SetMaterial(Material::kReflective)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(1.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(sphere));
@@ -60,7 +56,6 @@ class SimpleSceneBenchmark : public BenchmarkBase {
         sph_radius);
     sphere->SetColor(colors::kPurple)
         .SetMaterial(Material::kReflective)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(0.75);
     universe_.AddObject(std::move(sphere));
@@ -72,14 +67,12 @@ class SimpleSceneBenchmark : public BenchmarkBase {
         std::make_unique<Triangle>(fbot_left, btop_left, ftop_left);
     trian->SetColor(left_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(fbot_left, bbot_left, btop_left);
     trian->SetColor(left_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
@@ -88,14 +81,12 @@ class SimpleSceneBenchmark : public BenchmarkBase {
     trian = std::make_unique<Triangle>(fbot_right, ftop_right, btop_right);
     trian->SetColor(right_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(fbot_right, btop_right, bbot_right);
     trian->SetColor(right_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
@@ -104,14 +95,12 @@ class SimpleSceneBenchmark : public BenchmarkBase {
     trian = std::make_unique<Triangle>(fbot_left, fbot_right, bbot_left);
     trian->SetColor(bot_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(fbot_right, bbot_right, bbot_left);
     trian->SetColor(bot_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
@@ -120,14 +109,12 @@ class SimpleSceneBenchmark : public BenchmarkBase {
     trian = std::make_unique<Triangle>(ftop_right, ftop_left, btop_left);
     trian->SetColor(top_wall_color)
         .SetMaterial(Material::kLightSource)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(ftop_right, btop_left, btop_right);
     trian->SetColor(top_wall_color)
         .SetMaterial(Material::kLightSource)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
@@ -136,14 +123,12 @@ class SimpleSceneBenchmark : public BenchmarkBase {
     trian = std::make_unique<Triangle>(bbot_left, btop_right, btop_left);
     trian->SetColor(back_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(bbot_left, bbot_right, btop_right);
     trian->SetColor(back_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(0.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
@@ -152,14 +137,12 @@ class SimpleSceneBenchmark : public BenchmarkBase {
     trian = std::make_unique<Triangle>(fbot_left, ftop_left, ftop_right);
     trian->SetColor(front_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(1.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));
     trian = std::make_unique<Triangle>(fbot_left, ftop_right, fbot_right);
     trian->SetColor(front_wall_color)
         .SetMaterial(wall_material)
-        .SetHitPrecision(HIT_PRECISION)
         .SetPolishness(1.0)
         .SetReflectionCoef(1.0);
     universe_.AddObject(std::move(trian));

@@ -43,7 +43,7 @@ BounceRecord pixel::MakeRayBounce(Ray& ray,
   for (size_t i = 0; i < all_objects.size(); i++) {
     const auto& cur_obj = all_objects[i];
     dist = cur_obj->GetClosesDist(ray);
-    if (dist && dist > cur_obj->GetHitPrecision() && min_dist > *dist) {
+    if (dist && min_dist > *dist) {
       min_dist = *dist;
       obj_idx = i;
     }

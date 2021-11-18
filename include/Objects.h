@@ -14,14 +14,11 @@
 
 // TODO here is an opportunity to add kRefractive material
 enum class Material { kNoMaterial = 0, kReflective, kLightSource };
-// TODO Can I make object interface in template way or something ? In order to
-// avoid vtbl
 /** Interface object class*/
 class Object {
  private:
   double polishness_ = 0.0;
   double refl_coef_ = 1.0;
-  double hit_precision_ = 1e-9;
   Color color_ = colors::kNoColor;
   Material mat_ = Material::kNoMaterial;
   mutable std::mt19937 rnd_{0};
@@ -37,10 +34,6 @@ class Object {
     return *this;
   }
 
-  constexpr Object& SetHitPrecision(double prc) {
-    hit_precision_ = prc;
-    return *this;
-  }
   /**
    * Sets degree of the polishness. Its value should be in the range [0, 1]
    * Where 0 - not polished - all reflections are random
@@ -68,7 +61,6 @@ class Object {
 
   constexpr const Color& GetColor() const { return color_; }
   constexpr Material GetMaterial() const { return mat_; }
-  constexpr double GetHitPrecision() const { return hit_precision_; }
   constexpr double GetPolishness() const { return polishness_; }
   constexpr double GetReflectionCoefficient() const { return refl_coef_; }
 
@@ -199,8 +191,6 @@ class Triangle : public Object {
 
   /** @return true if point is in triangle, false - otherwise*/
   constexpr bool CheckInTriangle(const GeoVec& point) const {
-    assert(std::abs(Det3x3({GeoVec{p0_, p1_}, GeoVec{p0_, p2_},
-                            GeoVec{p0_, point}})) < GetHitPrecision());
     double norm_x = TransformXCoor(checker_.conversion_matrix, point);
     double norm_y = TransformYCoor(checker_.conversion_matrix, point);
     if (norm_x < checker_.x_sorted[0].x_ || norm_x > checker_.x_sorted[2].x_ ||

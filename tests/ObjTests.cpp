@@ -52,9 +52,12 @@ TEST(SphereTests, Reflect) {
     GeoVec exp_pos{3, 0, 0};
     GeoVec exp_dir{1, 0, 0};
     EXPECT_EQ(exp_dir, r.GetDir());
-    EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, 1.1 * s.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, s.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, s.GetHitPrecision());
+    // EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, 1.1 * s.GetHitPrecision());
+    // EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, s.GetHitPrecision());
+    // EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, s.GetHitPrecision());
+    EXPECT_DOUBLE_EQ(exp_pos.x_, r.GetPos().x_);
+    EXPECT_DOUBLE_EQ(exp_pos.y_, r.GetPos().y_);
+    EXPECT_DOUBLE_EQ(exp_pos.z_, r.GetPos().z_);
   }
 
   Sphere s2{GeoVec{0, 0, 0}, 5};
@@ -64,12 +67,12 @@ TEST(SphereTests, Reflect) {
     EXPECT_TRUE(s2.TryReflect(r, 3));
     GeoVec exp_pos{4, 3, 0};
     GeoVec exp_dir{0.28, 0.96, 0};
-    EXPECT_NEAR(exp_dir.x_, r.GetDir().x_, s2.GetHitPrecision());
-    EXPECT_NEAR(exp_dir.y_, r.GetDir().y_, s2.GetHitPrecision());
-    EXPECT_NEAR(exp_dir.z_, r.GetDir().z_, s2.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, 1.1 * s2.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, 1.1 * s2.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, 1.1 * s2.GetHitPrecision());
+    EXPECT_DOUBLE_EQ(exp_dir.x_, r.GetDir().x_);
+    EXPECT_DOUBLE_EQ(exp_dir.y_, r.GetDir().y_);
+    EXPECT_DOUBLE_EQ(exp_dir.z_, r.GetDir().z_);
+    EXPECT_DOUBLE_EQ(exp_pos.x_, r.GetPos().x_);
+    EXPECT_DOUBLE_EQ(exp_pos.y_, r.GetPos().y_);
+    EXPECT_DOUBLE_EQ(exp_pos.z_, r.GetPos().z_);
   }
 }
 
@@ -218,9 +221,9 @@ TEST(TriangleTests, Reflect) {
     GeoVec exp_dir{0.0, 0.0, 1.0};
     GeoVec exp_pos{0.25, 0.25, 0.0};
     EXPECT_EQ(exp_dir, r.GetDir());
-    EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, tr.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, tr.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, tr.GetHitPrecision());
+    EXPECT_DOUBLE_EQ(exp_pos.x_, r.GetPos().x_);
+    EXPECT_DOUBLE_EQ(exp_pos.y_, r.GetPos().y_);
+    EXPECT_DOUBLE_EQ(exp_pos.z_, r.GetPos().z_);
   }
   {  // General case
     GeoVec pos{0.25, -3.75, 3};
@@ -229,11 +232,12 @@ TEST(TriangleTests, Reflect) {
     EXPECT_TRUE(tr.TryReflect(r, 5));
     GeoVec exp_dir{0.0, 4.0, 3.0};
     exp_dir.Norm();
+    // For some reasons z component fails double comparison
     GeoVec exp_pos{0.25, 0.25, 0.0};
     EXPECT_EQ(exp_dir, r.GetDir());
-    EXPECT_NEAR(exp_pos.x_, r.GetPos().x_, tr.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.y_, r.GetPos().y_, tr.GetHitPrecision());
-    EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, tr.GetHitPrecision());
+    EXPECT_DOUBLE_EQ(exp_pos.x_, r.GetPos().x_);
+    EXPECT_DOUBLE_EQ(exp_pos.y_, r.GetPos().y_);
+    EXPECT_NEAR(exp_pos.z_, r.GetPos().z_, 1e-15);
   }
 }
 

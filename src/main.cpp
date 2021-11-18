@@ -11,8 +11,6 @@
 #include "Ray.h"
 #include "Scene.h"
 
-#define HIT_PRECISION 1e-9
-
 Scene MakeSimpleRoomScene(double width, double height, double depth,
                           double src_radius) {
   GeoVec ftop_left{0, 0, 0};
@@ -31,7 +29,6 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       GeoVec{width / 2, height - src_radius, depth / 2}, src_radius);
   sphere->SetColor(colors::kBlue)
       .SetMaterial(Material::kReflective)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.1)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(sphere));
@@ -41,7 +38,6 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       src_radius);
   sphere->SetColor(colors::kNoColor)
       .SetMaterial(Material::kReflective)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(1.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(sphere));
@@ -51,7 +47,6 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
       src_radius);
   sphere->SetColor(colors::kPurple)
       .SetMaterial(Material::kReflective)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(0.75);
   universe.AddObject(std::move(sphere));
@@ -62,14 +57,12 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   ObjHolder trian = std::make_unique<Triangle>(fbot_left, btop_left, ftop_left);
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_left, bbot_left, btop_left);
   trian->SetColor(left_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
@@ -78,14 +71,12 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian = std::make_unique<Triangle>(fbot_right, ftop_right, btop_right);
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_right, btop_right, bbot_right);
   trian->SetColor(right_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
@@ -94,14 +85,12 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian = std::make_unique<Triangle>(fbot_left, fbot_right, bbot_left);
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_right, bbot_right, bbot_left);
   trian->SetColor(bot_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
@@ -110,14 +99,12 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian = std::make_unique<Triangle>(ftop_right, ftop_left, btop_left);
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(ftop_right, btop_left, btop_right);
   trian->SetColor(top_wall_color)
       .SetMaterial(Material::kLightSource)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
@@ -126,14 +113,12 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian = std::make_unique<Triangle>(bbot_left, btop_right, btop_left);
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(bbot_left, bbot_right, btop_right);
   trian->SetColor(back_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(0.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
@@ -142,14 +127,12 @@ Scene MakeSimpleRoomScene(double width, double height, double depth,
   trian = std::make_unique<Triangle>(fbot_left, ftop_left, ftop_right);
   trian->SetColor(front_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(1.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
   trian = std::make_unique<Triangle>(fbot_left, ftop_right, fbot_right);
   trian->SetColor(front_wall_color)
       .SetMaterial(wall_material)
-      .SetHitPrecision(HIT_PRECISION)
       .SetPolishness(1.0)
       .SetReflectionCoef(1.0);
   universe.AddObject(std::move(trian));
