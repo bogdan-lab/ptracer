@@ -39,7 +39,7 @@ TEST(SphereTests, GetNorm) {
 
 TEST(SphereTests, Reflect) {
   Sphere s{GeoVec{0, 0, 0}, 3};
-  s.SetPolishness(1.0);
+  s.SetPolishness(1.0).SetReflectionCoef(1.0);
 #ifndef NDEBUG
   {
     Ray r{GeoVec{1, 0, 0}, GeoVec{12, 5, 6}};
@@ -48,7 +48,7 @@ TEST(SphereTests, Reflect) {
 #endif  // NDEBUG
   {     // 0 degree incident
     Ray r{GeoVec{5, 0, 0}, GeoVec{-1, 0, 0}};
-    s.Reflect(r, 2.0);
+    EXPECT_TRUE(s.TryReflect(r, 2.0));
     GeoVec exp_pos{3, 0, 0};
     GeoVec exp_dir{1, 0, 0};
     EXPECT_EQ(exp_dir, r.GetDir());
@@ -61,7 +61,7 @@ TEST(SphereTests, Reflect) {
   s2.SetPolishness(1.0);
   {  // general case
     Ray r{GeoVec{7, 3, 0}, GeoVec{-1, 0, 0}};
-    s2.Reflect(r, 3);
+    EXPECT_TRUE(s2.TryReflect(r, 3));
     GeoVec exp_pos{4, 3, 0};
     GeoVec exp_dir{0.28, 0.96, 0};
     EXPECT_NEAR(exp_dir.x_, r.GetDir().x_, s2.GetHitPrecision());
@@ -201,7 +201,7 @@ TEST(TriangleTests, GetClosestDistance) {
 
 TEST(TriangleTests, Reflect) {
   Triangle tr{GeoVec{0, 0, 0}, GeoVec{1, 0, 0}, GeoVec{0, 1, 0}};
-  tr.SetPolishness(1.0);
+  tr.SetPolishness(1.0).SetReflectionCoef(1.0);
 #ifndef NDEBUG
   {  // incorrect data
     GeoVec pos{0.25, 0.25, -37};
@@ -214,7 +214,7 @@ TEST(TriangleTests, Reflect) {
     GeoVec pos{0.25, 0.25, 37};
     GeoVec dir{0.0, 0.0, -1};
     Ray r{pos, dir};
-    tr.Reflect(r, 37);
+    EXPECT_TRUE(tr.TryReflect(r, 37));
     GeoVec exp_dir{0.0, 0.0, 1.0};
     GeoVec exp_pos{0.25, 0.25, 0.0};
     EXPECT_EQ(exp_dir, r.GetDir());
@@ -226,7 +226,7 @@ TEST(TriangleTests, Reflect) {
     GeoVec pos{0.25, -3.75, 3};
     GeoVec dir{0.0, 4.0, -3};
     Ray r{pos, dir};
-    tr.Reflect(r, 5);
+    EXPECT_TRUE(tr.TryReflect(r, 5));
     GeoVec exp_dir{0.0, 4.0, 3.0};
     exp_dir.Norm();
     GeoVec exp_pos{0.25, 0.25, 0.0};

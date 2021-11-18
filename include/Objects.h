@@ -71,15 +71,9 @@ class Object {
   constexpr double GetHitPrecision() const { return hit_precision_; }
   constexpr double GetPolishness() const { return polishness_; }
   constexpr double GetReflectionCoefficient() const { return refl_coef_; }
-  // TODO DoReflection should be protected ?
-  /** Performes reflecion based on the object polishness*/
-  GeoVec DoReflection(const GeoVec& dir, const GeoVec& norm) const {
-    return HybridReflect(rnd_, polishness_, dir, norm);
-  }
-  // TODO maybe it will be more effective to roll for reflection before
-  // calculating distance ?
+
   /**
-   * Method desides whether ray will be reflected or not based on the object
+   * Method decides whether ray will be reflected or not based on the object
    * reflection coefficient
    * @param ray - in/out incident ray. If reflection happened will contain new
    * direction and new ray position.
@@ -92,7 +86,10 @@ class Object {
     assert(refl_coef_ <= 1);
     std::uniform_real_distribution<double> d{0, 1};
     if (d(rnd_) < refl_coef_) {
-      Reflect(ray, dist);
+      assert(ray.GetDir().Dot(norm_) < 0);
+      ray.Advance(dist);
+      ray.UpdateDirection(HybridReflect(rnd_, polishness_, ray.GetDir(),
+                                        GetNorm(ray.GetPos())));
       return true;
     }
     return false;
@@ -107,14 +104,7 @@ class Object {
    * direction of surface reflection
    */
   virtual GeoVec GetNorm(const GeoVec& p) const = 0;
-  // TODO Reflect method does not reflect anything - change name, maybe move to
-  // the base class ?
-  /**
-   * This method conrain object specific lojic required for performing
-   * reflection also it moves ray to the given dist and make sure it have not
-   * left scene borders
-   */
-  virtual void Reflect(Ray& ray, double dist) const = 0;
+
   virtual ~Object() = default;
 };
 
@@ -131,10 +121,9 @@ class Sphere : public Object {
 
   std::optional<double> GetClosesDist(const Ray& ray) const override {
     GeoVec ray_to_c{ray.GetPos(), center_};
-    double dist_to_c = ray_to_c.Len();
-    assert(dist_to_c > r_);  // should not be inside sphere
     double dist_proj = ray_to_c.Dot(ray.GetDir());
     if (dist_proj <= 0) return std::nullopt;  // ray directed away!
+    double dist_to_c = ray_to_c.Len();
     double D_quarter = dist_proj * dist_proj - dist_to_c * dist_to_c + r_ * r_;
     if (D_quarter <= 0)
       return std::nullopt;  //==0 - ignore when ray only touch the surface
@@ -142,18 +131,6 @@ class Sphere : public Object {
   }
 
   GeoVec GetNorm(const GeoVec& p) const override { return (p - center_) / r_; }
-
-  void Reflect(Ray& ray, double dist) const override {
-    const auto& ray_dir = ray.GetDir();
-    const auto& ray_pos = ray.GetPos();
-    assert(dist_btw_points(ray_pos, center_) > r_);
-    ray.Advance(dist);
-    while (dist_btw_points(ray_pos, center_) <= r_) {
-      ray.StepBack(GetHitPrecision());
-    }
-    assert(dist_btw_points(ray_pos, center_) > r_);
-    ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
-  }
 };
 /** Struct for representing line like y = k*x + b*/
 struct Line {
@@ -220,18 +197,6 @@ class Triangle : public Object {
 
   GeoVec GetNorm(const GeoVec& /*p*/) const override { return norm_; }
 
-  void Reflect(Ray& ray, double dist) const override {
-    const auto& ray_dir = ray.GetDir();
-    const auto& ray_pos = ray.GetPos();
-    assert(ray_dir.Dot(norm_) < 0);
-    ray.Advance(dist);
-    GeoVec check_vec{p0_, ray_pos};
-    while (check_vec.Dot(norm_) < 0) {
-      ray.StepBack(GetHitPrecision());
-      check_vec = {p0_, ray_pos};
-    }
-    ray.UpdateDirection(DoReflection(ray_dir, GetNorm(ray_pos)));
-  }
   /** @return true if point is in triangle, false - otherwise*/
   constexpr bool CheckInTriangle(const GeoVec& point) const {
     assert(std::abs(Det3x3({GeoVec{p0_, p1_}, GeoVec{p0_, p2_},
