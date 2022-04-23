@@ -5,7 +5,7 @@
 #include <string_view>
 
 Config::Config(std::string_view file_name) {
-  std::ifstream input(file_name);
+  std::ifstream input{std::string(file_name)};
   if (!input.is_open()) {
     std::cout << "Cannot open file " << file_name << '\n';
     return;

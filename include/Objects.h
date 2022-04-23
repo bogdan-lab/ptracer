@@ -79,8 +79,8 @@ class Object {
     assert(refl_coef_ <= 1);
     std::uniform_real_distribution<double> d{0, 1};
     if (d(rnd_) < refl_coef_) {
-      assert(ray.GetDir().Dot(norm_) < 0);
       ray.Advance(dist);
+      assert(ray.GetDir().Dot(GetNorm(ray.GetPos())) < 0);
       ray.UpdateDirection(HybridReflect(rnd_, polishness_, ray.GetDir(),
                                         GetNorm(ray.GetPos())));
       return true;
