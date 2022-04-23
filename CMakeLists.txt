@@ -34,6 +34,9 @@ if(BENCHMARK)
     add_compile_options(-fno-omit-frame-pointer)
 endif()
 
+set(NLOHMANN_JSON_PATH "third_party/json")
+add_subdirectory(${NLOHMANN_JSON_PATH} ${NLOHMANN_JSON_PATH}/build)
+
 
 add_subdirectory(src)
 add_subdirectory(benchmarks)
