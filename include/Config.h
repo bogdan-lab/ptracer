@@ -8,23 +8,32 @@
 #include <vector>
 
 #include "Color.h"
+#include "GeoVec.h"
 #include "Objects.h"
 
 struct CameraSettings {
-  // screen_plane
-  double distance_to_screen;
+  GeoVec screen_top_left_coor;
+  GeoVec screen_top_right_coor;
+  GeoVec screen_bot_left_coor;
+  double distance_to_screen = 0.0;
 };
 
 struct GeneralSettings {
-  size_t sample_per_pixel = 1;
-  size_t max_bounce_number = 1;
+  int sample_per_pixel = 1;
+  int max_bounce_number = 1;
+  int pic_width_in_pixel = 1;
+  int pic_height_in_pixel = 1;
   std::string out_file_name;
 };
 
 class Config {
  public:
   Config(const std::string& file_name);
-
+  /**
+   * @brief Returns parsed camera settings. If the returned value is not empty,
+   * than and parameters are set correctly and there is no need to make some
+   * additional checks.
+   */
   const std::optional<CameraSettings>& GetCameraSettings() const {
     return camera_settings_;
   }
@@ -42,8 +51,8 @@ class Config {
   }
   /**
    * @brief Returns parsed general settings. If the returned value is not empty,
-   * than all paarmeters are set correctly and do not need to be additionally
-   * checked.
+   * than and parameters are set correctly and there is no need to make some
+   * additional checks.
    */
   const std::optional<GeneralSettings>& GetGeneralSettings() const {
     return general_settings_;
@@ -51,6 +60,9 @@ class Config {
 
  private:
   static std::optional<GeneralSettings> ParseGeneralSettings(
+      const nlohmann::json& input);
+
+  static std::optional<CameraSettings> ParseCameraSettings(
       const nlohmann::json& input);
 
   std::optional<CameraSettings> camera_settings_;
