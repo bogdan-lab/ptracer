@@ -7,6 +7,7 @@ add_executable(unit_tests
     ObjTests.cpp
     CameraTests.cpp
     MatrixTests.cpp
+    ConfigTests.cpp
     )
 
 target_link_libraries(unit_tests PRIVATE ptracer CONAN_PKG::gtest)

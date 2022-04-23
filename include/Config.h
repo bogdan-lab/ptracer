@@ -2,6 +2,7 @@
 #define PATH_TRACER_CONFIG_H
 
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string_view>
 #include <vector>
@@ -11,18 +12,18 @@
 
 struct CameraSettings {
   // screen_plane
-  double distance_to_screen_;
+  double distance_to_screen;
 };
 
 struct GeneralSettings {
-  size_t sample_per_pixel_ = 0;
-  size_t max_bounce_number_ = 0;
-  std::string out_file_name_;
+  size_t sample_per_pixel = 1;
+  size_t max_bounce_number = 1;
+  std::string out_file_name;
 };
 
 class Config {
  public:
-  Config(std::string_view file_name);
+  Config(const std::string& file_name);
 
   const std::optional<CameraSettings>& GetCameraSettings() const {
     return camera_settings_;
@@ -39,14 +40,18 @@ class Config {
     }
     return result;
   }
-
+  /**
+   * @brief Returns parsed general settings. If the returned value is not empty,
+   * than all paarmeters are set correctly and do not need to be additionally
+   * checked.
+   */
   const std::optional<GeneralSettings>& GetGeneralSettings() const {
     return general_settings_;
   }
 
  private:
   static std::optional<GeneralSettings> ParseGeneralSettings(
-      std::ifstream& input);
+      const nlohmann::json& input);
 
   std::optional<CameraSettings> camera_settings_;
   std::optional<GeneralSettings> general_settings_;
