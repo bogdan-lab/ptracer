@@ -41,7 +41,7 @@ class Config {
    * @brief Returns observer pointers, which will become dangling if the
    * corresponding config instance will be destroyed.
    */
-  std::vector<const Object*> GetObjectSettings() const {
+  std::vector<const Object*> GetObjects() const {
     std::vector<const Object*> result;
     result.reserve(objects_.size());
     for (const auto& el : objects_) {
@@ -63,6 +63,9 @@ class Config {
       const nlohmann::json& input);
 
   static std::optional<CameraSettings> ParseCameraSettings(
+      const nlohmann::json& input);
+
+  static std::vector<std::unique_ptr<Object>> ParseObjects(
       const nlohmann::json& input);
 
   std::optional<CameraSettings> camera_settings_;

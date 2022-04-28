@@ -1,4 +1,5 @@
-﻿#include <gtest/gtest.h>
+﻿#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <filesystem>
 #include <fstream>
@@ -6,6 +7,9 @@
 #include <string>
 
 #include "Config.h"
+
+using ::testing::Each;
+using ::testing::NotNull;
 
 namespace {
 
@@ -180,3 +184,51 @@ TEST(ConfigTest, ParsingCameraOption4) {
   const std::optional<CameraSettings>& res = test.GetCameraSettings();
   EXPECT_FALSE(res);
 }
+
+TEST(ConfigTest, ParsingObjectOption1) {
+  // Parsing only spheres
+  std::string file_name = "test_config.json";
+  nlohmann::json cfg;
+  cfg["objects"] = {
+      {{"color", {0, 0, 255}},  // TODO Want to parse string here too
+       {"polishness", 0.1},
+       {"reflection", 1.0},
+       {"is_light_source", false},
+       {"type", "sphere"},
+       {"radius", 80.0},
+       {"center", {1, 2, 3}}},
+      {{"color", {100, 200, 50}},
+       {"polishness", 0.5},
+       {"reflection", 0.2},
+       {"is_light_source", true},
+       {"type", "sphere"},
+       {"radius", 10.0},
+       {"center", {5, 6, 7}}}};
+  std::unique_ptr<RAIIConfigFile> config_file =
+      RAIIConfigFile::CreateFile(file_name, cfg.dump());
+  ASSERT_TRUE(config_file);
+  Config test(file_name);
+  std::vector<const Object*> res = test.GetObjects();
+  ASSERT_EQ(res.size(), 2);
+  ASSERT_THAT(res, Each(NotNull()));
+  const Sphere* sph1 = dynamic_cast<const Sphere*>(res.front());
+  ASSERT_THAT(sph1, NotNull());
+  EXPECT_EQ(sph1->GetColor(), colors::kBlue);
+  EXPECT_EQ(sph1->GetMaterial(), Material::kReflective);
+  EXPECT_DOUBLE_EQ(sph1->GetPolishness(), 0.1);
+  EXPECT_DOUBLE_EQ(sph1->GetReflectionCoefficient(), 1.0);
+  EXPECT_DOUBLE_EQ(sph1->GetRadius(), 80.0);
+  EXPECT_EQ(sph1->GetCenter(), GeoVec(1, 2, 3));
+
+  const Sphere* sph2 = dynamic_cast<const Sphere*>(res.back());
+  ASSERT_THAT(sph2, NotNull());
+  EXPECT_EQ(sph2->GetColor(), Color(100, 200, 50));
+  EXPECT_EQ(sph2->GetMaterial(), Material::kLightSource);
+  EXPECT_DOUBLE_EQ(sph2->GetPolishness(), 0.5);
+  EXPECT_DOUBLE_EQ(sph2->GetReflectionCoefficient(), 0.2);
+  EXPECT_DOUBLE_EQ(sph2->GetRadius(), 10.0);
+  EXPECT_EQ(sph2->GetCenter(), GeoVec(5, 6, 7));
+}
+
+// TODO add sphere test with bad data: reflection, polishness, color - out of
+// bounds string values should be compared case insensitively

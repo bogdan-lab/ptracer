@@ -112,6 +112,9 @@ class Sphere : public Object {
     assert(r_ > 0);
   }
 
+  double GetRadius() const { return r_; }
+  const GeoVec& GetCenter() const { return center_; }
+
   std::optional<double> GetClosesDist(const Ray& ray) const override {
     GeoVec ray_to_c{ray.GetPos(), center_};
     double dist_proj = ray_to_c.Dot(ray.GetDir());
