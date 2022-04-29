@@ -55,16 +55,23 @@ bool ReadPoint(const nlohmann::json& point_arr, GeoVec& out) {
   return true;
 }
 
+bool OpenJSONFile(const std::string& file_name, nlohmann::json& json) {
+  std::ifstream input{file_name};
+  if (!input.is_open()) {
+    return false;
+  }
+  input >> json;
+  return true;
+}
+
 }  // namespace
 
 Config::Config(const std::string& file_name) {
-  std::ifstream input{file_name};
-  if (!input.is_open()) {
+  nlohmann::json cfg_json;
+  if (!OpenJSONFile(file_name, cfg_json)) {
     std::cout << "Cannot open file " << file_name << '\n';
     return;
   }
-  nlohmann::json cfg_json;
-  input >> cfg_json;
   general_settings_ = ParseGeneralSettings(cfg_json["general"]);
   camera_settings_ = ParseCameraSettings(cfg_json["camera"]);
   objects_ = ParseObjects(cfg_json["objects"]);
@@ -252,12 +259,28 @@ bool ReadTriangles(const nlohmann::json& node,
   polishness = std::clamp(polishness, 0.0, 1.0);
 
   std::vector<GeoVec> points;
-  if (!node.contains("points") || !ReadPointVector(node["points"], points)) {
-    return false;
-  }
   std::vector<std::tuple<int, int, int>> faces;
-  if (!node.contains("faces") || !ReadFacesVector(node["faces"], faces)) {
-    return false;
+  if (node.contains("description")) {
+    // points and faces are described in separate file
+    nlohmann::json prop_json;
+
+    if (!OpenJSONFile(node["description"], prop_json)) return false;
+    if (!prop_json.contains("points") ||
+        !ReadPointVector(prop_json["points"], points)) {
+      return false;
+    }
+    if (!prop_json.contains("faces") ||
+        !ReadFacesVector(prop_json["faces"], faces)) {
+      return false;
+    }
+
+  } else {
+    if (!node.contains("points") || !ReadPointVector(node["points"], points)) {
+      return false;
+    }
+    if (!node.contains("faces") || !ReadFacesVector(node["faces"], faces)) {
+      return false;
+    }
   }
   size_t pts_size = points.size();
   if (std::any_of(faces.begin(), faces.end(), [pts_size](const auto& f) {

@@ -339,4 +339,71 @@ TEST(ConfigTest, ParsingObjectOption3) {
   }
 }
 
-// TODO Reading triangle from the separate file
+TEST(ConfigTest, ParsingObjectOption4) {
+  // Parsing only triangles from separate file
+  std::string prop_filename = "triangles_description.json";
+  nlohmann::json prop;
+  prop = {{"points", {{1, 2, 3}, {4, 5.6, 6}, {7.2, 8.3, 9}, {-5, -10, -3.7}}},
+          {"faces", {{0, 1, 2}, {0, 1, 3}, {3, 2, 1}, {2, 0, 3}}}};
+  std::string file_name = "test_config.json";
+  std::unique_ptr<RAIIConfigFile> property_file =
+      RAIIConfigFile::CreateFile(prop_filename, prop.dump());
+  nlohmann::json cfg;
+  cfg["objects"] = {{{"color", "green"},
+                     {"polishness", 150.0},
+                     {"reflection", 0.2},
+                     {"is_light_source", false},
+                     {"type", "triangles"},
+                     {"description", "triangles_description.json"}}};
+  std::unique_ptr<RAIIConfigFile> config_file =
+      RAIIConfigFile::CreateFile(file_name, cfg.dump());
+  ASSERT_TRUE(config_file);
+  Config test(file_name);
+  std::vector<const Object*> res = test.GetObjects();
+  ASSERT_EQ(res.size(), 4);
+  ASSERT_THAT(res, Each(NotNull()));
+  {
+    const auto* tri = dynamic_cast<const Triangle*>(res[0]);
+    ASSERT_THAT(tri, NotNull());
+    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
+    EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
+    EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
+    EXPECT_EQ(tri->GetPoint0(), GeoVec(1, 2, 3));
+    EXPECT_EQ(tri->GetPoint1(), GeoVec(4, 5.6, 6));
+    EXPECT_EQ(tri->GetPoint2(), GeoVec(7.2, 8.3, 9));
+  }
+  {
+    const auto* tri = dynamic_cast<const Triangle*>(res[1]);
+    ASSERT_THAT(tri, NotNull());
+    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
+    EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
+    EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
+    EXPECT_EQ(tri->GetPoint0(), GeoVec(1, 2, 3));
+    EXPECT_EQ(tri->GetPoint1(), GeoVec(4, 5.6, 6));
+    EXPECT_EQ(tri->GetPoint2(), GeoVec(-5, -10, -3.7));
+  }
+  {
+    const auto* tri = dynamic_cast<const Triangle*>(res[2]);
+    ASSERT_THAT(tri, NotNull());
+    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
+    EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
+    EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
+    EXPECT_EQ(tri->GetPoint0(), GeoVec(-5, -10, -3.7));
+    EXPECT_EQ(tri->GetPoint1(), GeoVec(7.2, 8.3, 9));
+    EXPECT_EQ(tri->GetPoint2(), GeoVec(4, 5.6, 6));
+  }
+  {
+    const auto* tri = dynamic_cast<const Triangle*>(res[3]);
+    ASSERT_THAT(tri, NotNull());
+    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
+    EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
+    EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
+    EXPECT_EQ(tri->GetPoint2(), GeoVec(-5, -10, -3.7));
+    EXPECT_EQ(tri->GetPoint0(), GeoVec(7.2, 8.3, 9));
+    EXPECT_EQ(tri->GetPoint1(), GeoVec(1, 2, 3));
+  }
+}
