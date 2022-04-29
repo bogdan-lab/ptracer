@@ -126,6 +126,26 @@ std::optional<CameraSettings> Config::ParseCameraSettings(
 
 namespace {
 
+std::optional<Color> StringToColor(std::string_view str) {
+  static std::vector<std::string> names{
+      "BLACK", "WHITE",     "RED",    "GREEN",      "BLUE",
+      "GREY",  "ORANGE",    "YELLOW", "LIGHTGREEN", "PALEGREEN",
+      "CAYAN", "LIGHTBLUE", "VIOLET", "PURPLE"};
+  static std::vector<Color> colors{
+      colors::kBlack,     colors::kWhite,  colors::kRed,
+      colors::kGreen,     colors::kBlue,   colors::kGrey,
+      colors::kOrange,    colors::kYellow, colors::kLightGreen,
+      colors::kPaleGreen, colors::kCayan,  colors::kLightBlue,
+      colors::kViolet,    colors::kPurple};
+  std::string upper(str);
+  std::transform(
+      upper.begin(), upper.end(), upper.begin(),
+      [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+  auto it = std::find(names.begin(), names.end(), upper);
+  if (it == names.end()) return std::nullopt;
+  return *(colors.begin() + (it - names.begin()));
+}
+
 bool ReadColor(const nlohmann::json& cfg, const std::string& name, Color& out,
                Color def_color) {
   if (!cfg.contains(name)) {
@@ -137,15 +157,21 @@ bool ReadColor(const nlohmann::json& cfg, const std::string& name, Color& out,
     if (node.size() != 3) return false;
     int val = node.at(0).get<int>();
     if (val < 0) return false;
-    out.red_ = val;
+    out.red_ = static_cast<uint8_t>(std::clamp(val, 0, 255));
     val = node.at(1).get<int>();
     if (val < 0) return false;
-    out.green_ = val;
+    out.green_ = static_cast<uint8_t>(std::clamp(val, 0, 255));
     val = node.at(2).get<int>();
     if (val < 0) return false;
-    out.blue_ = val;
+    out.blue_ = static_cast<uint8_t>(std::clamp(val, 0, 255));
+    return true;
+  } else if (node.is_string()) {
+    std::optional<Color> buff = StringToColor(node.get<std::string>());
+    if (!buff) return false;
+    out = buff.value();
     return true;
   } else {
+    return false;
   }
 }
 
@@ -163,12 +189,12 @@ std::unique_ptr<Object> ReadSphere(const nlohmann::json& cfg) {
   if (!ReadPositiveValue(cfg, "reflection", buff, 0.75)) {
     return nullptr;
   }
-  result->SetReflectionCoef(buff);
+  result->SetReflectionCoef(std::clamp(buff, 0.0, 1.0));
 
   if (!ReadPositiveValue(cfg, "polishness", buff, 0.9)) {
     return nullptr;
   }
-  result->SetPolishness(buff);
+  result->SetPolishness(std::clamp(buff, 0.0, 1.0));
 
   Color color;
   if (!ReadColor(cfg, "color", color, colors::kGreen)) {
@@ -195,7 +221,10 @@ std::vector<std::unique_ptr<Object>> Config::ParseObjects(
       continue;
     }
     type = node["type"];
-    if (type == "sphere") {
+    std::transform(
+        type.begin(), type.end(), type.begin(),
+        [](unsigned char ch) { return static_cast<char>(std::toupper(ch)); });
+    if (type == "SPHERE") {
       std::unique_ptr<Object> sphere = ReadSphere(node);
       if (sphere) result.push_back(std::move(sphere));
     }

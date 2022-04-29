@@ -186,24 +186,23 @@ TEST(ConfigTest, ParsingCameraOption4) {
 }
 
 TEST(ConfigTest, ParsingObjectOption1) {
-  // Parsing only spheres
+  // Parsing only spheres with good data
   std::string file_name = "test_config.json";
   nlohmann::json cfg;
-  cfg["objects"] = {
-      {{"color", {0, 0, 255}},  // TODO Want to parse string here too
-       {"polishness", 0.1},
-       {"reflection", 1.0},
-       {"is_light_source", false},
-       {"type", "sphere"},
-       {"radius", 80.0},
-       {"center", {1, 2, 3}}},
-      {{"color", {100, 200, 50}},
-       {"polishness", 0.5},
-       {"reflection", 0.2},
-       {"is_light_source", true},
-       {"type", "sphere"},
-       {"radius", 10.0},
-       {"center", {5, 6, 7}}}};
+  cfg["objects"] = {{{"color", "blue"},
+                     {"polishness", 0.1},
+                     {"reflection", 1.0},
+                     {"is_light_source", false},
+                     {"type", "sphere"},
+                     {"radius", 80.0},
+                     {"center", {1, 2, 3}}},
+                    {{"color", {100, 200, 50}},
+                     {"polishness", 0.5},
+                     {"reflection", 0.2},
+                     {"is_light_source", true},
+                     {"type", "sphere"},
+                     {"radius", 10.0},
+                     {"center", {5, 6, 7}}}};
   std::unique_ptr<RAIIConfigFile> config_file =
       RAIIConfigFile::CreateFile(file_name, cfg.dump());
   ASSERT_TRUE(config_file);
@@ -230,5 +229,46 @@ TEST(ConfigTest, ParsingObjectOption1) {
   EXPECT_EQ(sph2->GetCenter(), GeoVec(5, 6, 7));
 }
 
-// TODO add sphere test with bad data: reflection, polishness, color - out of
-// bounds string values should be compared case insensitively
+TEST(ConfigTest, ParsingObjectOption2) {
+  // Parsing only spheres with bad data
+  std::string file_name = "test_config.json";
+  nlohmann::json cfg;
+  cfg["objects"] = {{{"color", "ReD"},
+                     {"polishness", 150.0},
+                     {"reflection", 32.0},
+                     {"is_light_source", false},
+                     {"type", "Sphere"},
+                     {"radius", 81.0},
+                     {"center", {9.8, 0.5, 3.14}}},
+                    {{"color", {1000, 2000, 500}},
+                     {"is_light_source", true},
+                     {"type", "sPHERE"},
+                     {"radius", 10.0},
+                     {"center", {-5, -6, -7}}},
+                    {{"type", "sphere"}, {"radius", -64.0}},
+                    {{"type", "sphere"}}};
+  std::unique_ptr<RAIIConfigFile> config_file =
+      RAIIConfigFile::CreateFile(file_name, cfg.dump());
+  ASSERT_TRUE(config_file);
+  Config test(file_name);
+  std::vector<const Object*> res = test.GetObjects();
+  ASSERT_EQ(res.size(), 2);
+  ASSERT_THAT(res, Each(NotNull()));
+  const Sphere* sph1 = dynamic_cast<const Sphere*>(res.front());
+  ASSERT_THAT(sph1, NotNull());
+  EXPECT_EQ(sph1->GetColor(), colors::kRed);
+  EXPECT_EQ(sph1->GetMaterial(), Material::kReflective);
+  EXPECT_DOUBLE_EQ(sph1->GetPolishness(), 1.0);
+  EXPECT_DOUBLE_EQ(sph1->GetReflectionCoefficient(), 1.0);
+  EXPECT_DOUBLE_EQ(sph1->GetRadius(), 81.0);
+  EXPECT_EQ(sph1->GetCenter(), GeoVec(9.8, 0.5, 3.14));
+
+  const Sphere* sph2 = dynamic_cast<const Sphere*>(res.back());
+  ASSERT_THAT(sph2, NotNull());
+  EXPECT_EQ(sph2->GetColor(), Color(255, 255, 255));
+  EXPECT_EQ(sph2->GetMaterial(), Material::kLightSource);
+  EXPECT_DOUBLE_EQ(sph2->GetPolishness(), 0.9);
+  EXPECT_DOUBLE_EQ(sph2->GetReflectionCoefficient(), 0.75);
+  EXPECT_DOUBLE_EQ(sph2->GetRadius(), 10.0);
+  EXPECT_EQ(sph2->GetCenter(), GeoVec(-5, -6, -7));
+}
