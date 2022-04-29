@@ -191,6 +191,9 @@ class Triangle : public Object {
     return t;
   }
 
+  const GeoVec& GetPoint0() const { return p0_; }
+  const GeoVec& GetPoint1() const { return p1_; }
+  const GeoVec& GetPoint2() const { return p2_; }
   GeoVec GetNorm(const GeoVec& /*p*/) const override { return norm_; }
 
   /** @return true if point is in triangle, false - otherwise*/

@@ -39,24 +39,17 @@ bool ReadPositiveValue(const nlohmann::json& cfg, const std::string& name,
   return true;
 }
 
-bool ReadPoint(const nlohmann::json& cfg, const std::string& name,
-               GeoVec& out) {
-  if (!cfg.contains(name)) {
-    std::cout << "Cannot find " << name << " in the config file\n";
+bool ReadPoint(const nlohmann::json& point_arr, GeoVec& out) {
+  if (point_arr.size() != 3) {
     return false;
   }
-  if (cfg[name].size() != 3) {
-    std::cout << "Point " << name
-              << " should be defined by 3 coordinate values\n";
-    return false;
-  }
-  double val = cfg[name].at(0).get<double>();
+  double val = point_arr.at(0).get<double>();
   if (std::isnan(val)) return false;
   out.x_ = val;
-  val = cfg[name].at(1).get<double>();
+  val = point_arr.at(1).get<double>();
   if (std::isnan(val)) return false;
   out.y_ = val;
-  val = cfg[name].at(2).get<double>();
+  val = point_arr.at(2).get<double>();
   if (std::isnan(val)) return false;
   out.z_ = val;
   return true;
@@ -109,15 +102,18 @@ std::optional<CameraSettings> Config::ParseCameraSettings(
                          500.0)) {
     return std::nullopt;
   }
-  if (!ReadPoint(input, "screen_top_left_coordinate",
+  if (!input.contains("screen_top_left_coordinate") ||
+      !ReadPoint(input["screen_top_left_coordinate"],
                  result.screen_top_left_coor)) {
     return std::nullopt;
   }
-  if (!ReadPoint(input, "screen_top_right_coordinate",
+  if (!input.contains("screen_top_right_coordinate") ||
+      !ReadPoint(input["screen_top_right_coordinate"],
                  result.screen_top_right_coor)) {
     return std::nullopt;
   }
-  if (!ReadPoint(input, "screen_bot_left_coordinate",
+  if (!input.contains("screen_bot_left_coordinate") ||
+      !ReadPoint(input["screen_bot_left_coordinate"],
                  result.screen_bot_left_coor)) {
     return std::nullopt;
   }
@@ -177,15 +173,15 @@ bool ReadColor(const nlohmann::json& cfg, const std::string& name, Color& out,
 
 std::unique_ptr<Object> ReadSphere(const nlohmann::json& cfg) {
   GeoVec center;
-  if (!ReadPoint(cfg, "center", center)) {
+  if (!cfg.contains("center") || !ReadPoint(cfg["center"], center)) {
     return nullptr;
   }
-  double r = std::numeric_limits<double>::quiet_NaN();
-  if (!ReadPositiveValue(cfg, "radius", r)) {
+  double buff = std::numeric_limits<double>::quiet_NaN();
+  if (!ReadPositiveValue(cfg, "radius", buff)) {
     return nullptr;
   }
-  auto result = std::make_unique<Sphere>(center, r);
-  double buff;
+
+  auto result = std::make_unique<Sphere>(center, buff);
   if (!ReadPositiveValue(cfg, "reflection", buff, 0.75)) {
     return nullptr;
   }
@@ -202,10 +198,86 @@ std::unique_ptr<Object> ReadSphere(const nlohmann::json& cfg) {
   }
   result->SetColor(color);
 
+  if (!cfg.contains("is_light_source")) return nullptr;
   Material mat = cfg["is_light_source"].get<bool>() ? Material::kLightSource
                                                     : Material::kReflective;
   result->SetMaterial(mat);
   return result;
+}
+
+bool ReadPointVector(const nlohmann::json& node, std::vector<GeoVec>& out) {
+  out.clear();
+  out.reserve(node.size());
+  GeoVec point;
+  for (const auto& el : node) {
+    if (!ReadPoint(el, point)) return false;
+    out.push_back(point);
+  }
+  return true;
+}
+
+bool ReadFacesVector(const nlohmann::json& node,
+                     std::vector<std::tuple<int, int, int>>& out) {
+  out.reserve(node.size());
+  for (const auto& el : node) {
+    if (el.size() != 3) return false;
+    int i1 = el.at(0).get<int>();
+    int i2 = el.at(1).get<int>();
+    int i3 = el.at(2).get<int>();
+    if (i1 < 0 || i2 < 0 || i3 < 0) return false;
+    out.push_back(std::make_tuple(i1, i2, i3));
+  }
+  return true;
+}
+
+bool ReadTriangles(const nlohmann::json& node,
+                   std::vector<std::unique_ptr<Object>>& out) {
+  Color color;
+  if (!ReadColor(node, "color", color, colors::kGreen)) {
+    return false;
+  }
+  if (!node.contains("is_light_source")) return false;
+  Material mat = node["is_light_source"].get<bool>() ? Material::kLightSource
+                                                     : Material::kReflective;
+  double reflection = std::numeric_limits<double>::quiet_NaN();
+  if (!ReadPositiveValue(node, "reflection", reflection, 0.75)) {
+    return false;
+  }
+  reflection = std::clamp(reflection, 0.0, 1.0);
+
+  double polishness = std::numeric_limits<double>::quiet_NaN();
+  if (!ReadPositiveValue(node, "polishness", polishness, 0.9)) {
+    return false;
+  }
+  polishness = std::clamp(polishness, 0.0, 1.0);
+
+  std::vector<GeoVec> points;
+  if (!node.contains("points") || !ReadPointVector(node["points"], points)) {
+    return false;
+  }
+  std::vector<std::tuple<int, int, int>> faces;
+  if (!node.contains("faces") || !ReadFacesVector(node["faces"], faces)) {
+    return false;
+  }
+  size_t pts_size = points.size();
+  if (std::any_of(faces.begin(), faces.end(), [pts_size](const auto& f) {
+        return std::get<0>(f) >= pts_size || std::get<1>(f) >= pts_size ||
+               std::get<2>(f) >= pts_size;
+      })) {
+    return false;
+  }
+
+  out.reserve(faces.size());
+  for (const auto& f : faces) {
+    auto tri = std::make_unique<Triangle>(
+        points[std::get<0>(f)], points[std::get<1>(f)], points[std::get<2>(f)]);
+    tri->SetColor(color)
+        .SetMaterial(mat)
+        .SetPolishness(polishness)
+        .SetReflectionCoef(reflection);
+    out.push_back(std::move(tri));
+  }
+  return true;
 }
 
 }  // namespace
@@ -216,8 +288,9 @@ std::vector<std::unique_ptr<Object>> Config::ParseObjects(
   int count = 0;
   std::string type;
   for (auto node : input) {
+    count++;
     if (!node.contains("type")) {
-      std::cout << "object with index " << count << " has no type!\n";
+      std::cout << "Object with index " << count - 1 << " has no type!\n";
       continue;
     }
     type = node["type"];
@@ -226,9 +299,23 @@ std::vector<std::unique_ptr<Object>> Config::ParseObjects(
         [](unsigned char ch) { return static_cast<char>(std::toupper(ch)); });
     if (type == "SPHERE") {
       std::unique_ptr<Object> sphere = ReadSphere(node);
-      if (sphere) result.push_back(std::move(sphere));
+      if (!sphere) {
+        std::cout << "Bad object with index " << count - 1 << '\n';
+        continue;
+      }
+      result.push_back(std::move(sphere));
+    } else if (type == "TRIANGLES") {
+      std::vector<std::unique_ptr<Object>> triangles;
+      if (!ReadTriangles(node, triangles)) {
+        std::cout << "Bad object with index " << count - 1 << '\n';
+        continue;
+      }
+      for (auto& el : triangles) {
+        result.push_back(std::move(el));
+      }
+    } else {
+      std::cout << "Unknown type = " << node["type"] << '\n';
     }
-    count++;
   }
   return result;
 }
