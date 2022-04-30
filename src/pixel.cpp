@@ -66,3 +66,34 @@ BounceRecord pixel::MakeRayBounce(Ray& ray,
   }
   return {hit_obj->GetMaterial(), hit_obj->GetColor()};
 }
+
+std::vector<Ray> pixel::CreateRays(const Tile& tile, const GeoVec& ray_start,
+                                   std::mt19937& rnd, int ray_num) {
+  GeoVec to_top_left(ray_start, tile.top_left);
+  std::vector<Ray> result;
+  result.reserve(ray_num);
+  std::uniform_real_distribution<double> dist{0.0, 1.0};
+  while (ray_num--) {
+    result.emplace_back(ray_start, to_top_left + dist(rnd) * tile.width_vec +
+                                       dist(rnd) * tile.height_vec);
+  }
+  return result;
+}
+
+std::vector<pixel::Tile> pixel::CreateTiles(const GeoVec& top_left_point,
+                                            const GeoVec& top_right_point,
+                                            const GeoVec& bot_left_point,
+                                            int width_in_pixel,
+                                            int height_in_pixel) {
+  auto width_vec = GeoVec(top_left_point, top_right_point) / width_in_pixel;
+  auto height_vec = GeoVec(top_left_point, bot_left_point) / height_in_pixel;
+  std::vector<Tile> result;
+  result.reserve(width_in_pixel * height_in_pixel);
+  for (int h = 0; h < height_in_pixel; ++h) {
+    for (int w = 0; w < width_in_pixel; ++w) {
+      result.push_back({top_left_point + w * width_vec + h * height_vec,
+                        width_vec, height_vec});
+    }
+  }
+  return result;
+}
