@@ -58,7 +58,6 @@ class BenchmarkBase {
          << '\n';
   }
 
-  virtual void CreateUniverse() = 0;
   virtual void MkPicture() = 0;
 };
 
