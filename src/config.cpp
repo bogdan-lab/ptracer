@@ -9,6 +9,22 @@
 
 namespace {
 template <typename NumberType>
+bool ReadNonNegativeValue(const nlohmann::json& cfg, const std::string& name,
+                          NumberType& out, NumberType def_value) {
+  if (!cfg.contains(name)) {
+    out = def_value;
+    return true;
+  }
+  NumberType buff_val = cfg[name].get<NumberType>();
+  if (buff_val < 0) {
+    std::cout << name << " must be non negative!\n";
+    return false;
+  }
+  out = buff_val;
+  return true;
+}
+
+template <typename NumberType>
 bool ReadPositiveValue(const nlohmann::json& cfg, const std::string& name,
                        NumberType& out) {
   if (!cfg.contains(name)) {
@@ -189,12 +205,12 @@ std::unique_ptr<Object> ReadSphere(const nlohmann::json& cfg) {
   }
 
   auto result = std::make_unique<Sphere>(center, buff);
-  if (!ReadPositiveValue(cfg, "reflection", buff, 0.75)) {
+  if (!ReadNonNegativeValue(cfg, "reflection", buff, 0.75)) {
     return nullptr;
   }
   result->SetReflectionCoef(std::clamp(buff, 0.0, 1.0));
 
-  if (!ReadPositiveValue(cfg, "polishness", buff, 0.9)) {
+  if (!ReadNonNegativeValue(cfg, "polishness", buff, 0.9)) {
     return nullptr;
   }
   result->SetPolishness(std::clamp(buff, 0.0, 1.0));
@@ -247,13 +263,13 @@ bool ReadTriangles(const nlohmann::json& node,
   Material mat = node["is_light_source"].get<bool>() ? Material::kLightSource
                                                      : Material::kReflective;
   double reflection = std::numeric_limits<double>::quiet_NaN();
-  if (!ReadPositiveValue(node, "reflection", reflection, 0.75)) {
+  if (!ReadNonNegativeValue(node, "reflection", reflection, 0.75)) {
     return false;
   }
   reflection = std::clamp(reflection, 0.0, 1.0);
 
   double polishness = std::numeric_limits<double>::quiet_NaN();
-  if (!ReadPositiveValue(node, "polishness", polishness, 0.9)) {
+  if (!ReadNonNegativeValue(node, "polishness", polishness, 0.9)) {
     return false;
   }
   polishness = std::clamp(polishness, 0.0, 1.0);

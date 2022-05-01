@@ -74,7 +74,7 @@ class Object {
    *
    * @return true - if reflection happened, false - otherwise
    */
-  bool TryReflect(Ray& ray, double dist) {
+  bool TryReflect(Ray& ray, double dist) const {
     assert(refl_coef_ >= 0);
     assert(refl_coef_ <= 1);
     std::uniform_real_distribution<double> d{0, 1};

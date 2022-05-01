@@ -154,8 +154,14 @@ class SimpleSceneBenchmark : public BenchmarkBase {
     size_t px_num = cam.GetPxNum();
     std::vector<Color> col_vec;
     col_vec.reserve(px_num);
+    // temporary fix just for compilateion!
+    std::vector<const Object*> tmp;
+    for (const auto& el : universe_.GetObjects()) {
+      tmp.push_back(el.get());
+    }
+
     for (size_t i = 0; i < px_num; i++) {
-      col_vec.push_back(pixel::TraceRays(cam.GetPixelRays(i), universe_,
+      col_vec.push_back(pixel::TraceRays(cam.GetPixelRays(i), tmp,
                                          /*bounce_limit=*/1000));
       if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
     }

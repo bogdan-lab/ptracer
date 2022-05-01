@@ -173,7 +173,7 @@ TEST(ConfigTest, ParsingCameraOption4) {
   // Wrong size of the point
   std::string file_name = "test_config.json";
   nlohmann::json cfg;
-  cfg["camera"] = {{"distance_to_screen", -42.5},
+  cfg["camera"] = {{"distance_to_screen", 42.5},
                    {"screen_top_left_coordinate", {1.0, 2.0, 3.0}},
                    {"screen_top_right_coordinate", {4.0, 5.0, 6.0}},
                    {"screen_bot_left_coordinate", {7.0, 8.0}}};
@@ -197,8 +197,8 @@ TEST(ConfigTest, ParsingObjectOption1) {
                      {"radius", 80.0},
                      {"center", {1, 2, 3}}},
                     {{"color", {100, 200, 50}},
-                     {"polishness", 0.5},
-                     {"reflection", 0.2},
+                     {"polishness", 0.0},
+                     {"reflection", 0.0},
                      {"is_light_source", true},
                      {"type", "sphere"},
                      {"radius", 10.0},
@@ -223,8 +223,8 @@ TEST(ConfigTest, ParsingObjectOption1) {
   ASSERT_THAT(sph2, NotNull());
   EXPECT_EQ(sph2->GetColor(), Color(100, 200, 50));
   EXPECT_EQ(sph2->GetMaterial(), Material::kLightSource);
-  EXPECT_DOUBLE_EQ(sph2->GetPolishness(), 0.5);
-  EXPECT_DOUBLE_EQ(sph2->GetReflectionCoefficient(), 0.2);
+  EXPECT_DOUBLE_EQ(sph2->GetPolishness(), 0.0);
+  EXPECT_DOUBLE_EQ(sph2->GetReflectionCoefficient(), 0.0);
   EXPECT_DOUBLE_EQ(sph2->GetRadius(), 10.0);
   EXPECT_EQ(sph2->GetCenter(), GeoVec(5, 6, 7));
 }

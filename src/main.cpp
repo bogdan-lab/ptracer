@@ -11,154 +11,36 @@
 #include "Ray.h"
 #include "Scene.h"
 
-Scene MakeSimpleRoomScene(double width, double height, double depth,
-                          double src_radius) {
-  GeoVec ftop_left{0, 0, 0};
-  GeoVec ftop_right{width, 0, 0};
-  GeoVec fbot_left{0, height, 0};
-  GeoVec fbot_right{width, height, 0};
-
-  GeoVec btop_left{0, 0, depth};
-  GeoVec btop_right{width, 0, depth};
-  GeoVec bbot_left{0, height, depth};
-  GeoVec bbot_right{width, height, depth};
-
-  Scene universe;
-  // COMMON SPHERE
-  ObjHolder sphere = std::make_unique<Sphere>(
-      GeoVec{width / 2, height - src_radius, depth / 2}, src_radius);
-  sphere->SetColor(colors::kBlue)
-      .SetMaterial(Material::kReflective)
-      .SetPolishness(0.1)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(sphere));
-  // REFLECTIVE SPHERE
-  sphere = std::make_unique<Sphere>(
-      GeoVec{width / 2 - 2.1 * src_radius, height - src_radius, depth / 2},
-      src_radius);
-  sphere->SetColor(colors::kNoColor)
-      .SetMaterial(Material::kReflective)
-      .SetPolishness(1.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(sphere));
-  // ABSORBING SPHERE
-  sphere = std::make_unique<Sphere>(
-      GeoVec{width / 2 + 2.1 * src_radius, height - src_radius, depth / 2},
-      src_radius);
-  sphere->SetColor(colors::kPurple)
-      .SetMaterial(Material::kReflective)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(0.75);
-  universe.AddObject(std::move(sphere));
-  Material wall_material = Material::kReflective;
-  // Creating walls
-  // LEFT
-  Color left_wall_color = colors::kRed;
-  ObjHolder trian = std::make_unique<Triangle>(fbot_left, btop_left, ftop_left);
-  trian->SetColor(left_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  trian = std::make_unique<Triangle>(fbot_left, bbot_left, btop_left);
-  trian->SetColor(left_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  // RIGHT
-  Color right_wall_color = colors::kGreen;
-  trian = std::make_unique<Triangle>(fbot_right, ftop_right, btop_right);
-  trian->SetColor(right_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  trian = std::make_unique<Triangle>(fbot_right, btop_right, bbot_right);
-  trian->SetColor(right_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  // Bottom
-  Color bot_wall_color = colors::kGrey;
-  trian = std::make_unique<Triangle>(fbot_left, fbot_right, bbot_left);
-  trian->SetColor(bot_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  trian = std::make_unique<Triangle>(fbot_right, bbot_right, bbot_left);
-  trian->SetColor(bot_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  // TOP
-  Color top_wall_color = colors::kWhite;
-  trian = std::make_unique<Triangle>(ftop_right, ftop_left, btop_left);
-  trian->SetColor(top_wall_color)
-      .SetMaterial(Material::kLightSource)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  trian = std::make_unique<Triangle>(ftop_right, btop_left, btop_right);
-  trian->SetColor(top_wall_color)
-      .SetMaterial(Material::kLightSource)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  // BACK
-  Color back_wall_color = colors::kCayan;
-  trian = std::make_unique<Triangle>(bbot_left, btop_right, btop_left);
-  trian->SetColor(back_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  trian = std::make_unique<Triangle>(bbot_left, bbot_right, btop_right);
-  trian->SetColor(back_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(0.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  // FRONT
-  Color front_wall_color = colors::kNoColor;
-  trian = std::make_unique<Triangle>(fbot_left, ftop_left, ftop_right);
-  trian->SetColor(front_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(1.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-  trian = std::make_unique<Triangle>(fbot_left, ftop_right, fbot_right);
-  trian->SetColor(front_wall_color)
-      .SetMaterial(wall_material)
-      .SetPolishness(1.0)
-      .SetReflectionCoef(1.0);
-  universe.AddObject(std::move(trian));
-
-  return universe;
-}
-
 int main() {
-  double width = 600;
-  double height = 400;
-  double scene_depth = 400;
-  Scene universe = MakeSimpleRoomScene(width, height, scene_depth, 80.0);
-  Camera cam;
-  // cam.SetWidthInPixel(1200).SetHeightInPixel(800);
-  Camera::SetSamplePerPixel(400);
-
-  size_t px_num = cam.GetPxNum();
+  Config cfg("simple_scene.json");
+  if (!cfg.GetCameraSettings() || !cfg.GetGeneralSettings() ||
+      cfg.GetObjects().empty()) {
+    std::cout << "Config was not parsed correctly\n";
+    return 0;
+  }
+  GeneralSettings cfg_general = cfg.GetGeneralSettings().value();
+  CameraSettings cfg_camera = cfg.GetCameraSettings().value();
+  std::vector<pixel::Tile> tiles = pixel::CreateTiles(
+      cfg_camera.screen_top_left_coor, cfg_camera.screen_top_right_coor,
+      cfg_camera.screen_bot_left_coor, cfg_general.pic_width_in_pixel,
+      cfg_general.pic_height_in_pixel);
+  GeoVec viewer = pixel::CreateViewerPoint(cfg_camera);
   std::vector<Color> col_vec;
-  col_vec.reserve(px_num);
-  for (size_t i = 0; i < px_num; i++) {
-    col_vec.push_back(pixel::TraceRays(cam.GetPixelRays(i), universe,
-                                       /*bounce_limit=*/1000));
-    if ((10 * i) % px_num == 0) std::cerr << 100.0 * i / px_num << "%\n";
+  col_vec.reserve(tiles.size());
+  std::vector<const Object*> objects = cfg.GetObjects();
+  std::mt19937 rnd{std::time(nullptr)};
+  size_t count = 0;
+  for (const auto& tile : tiles) {
+    count++;
+    col_vec.push_back(pixel::TraceRays(
+        pixel::CreateRays(tile, viewer, rnd, cfg_general.sample_per_pixel),
+        objects, cfg_general.max_bounce_number));
+    if ((10ULL * count) % tiles.size() == 0ULL)
+      std::cerr << 100.0 * count / tiles.size() << "%\n";
   }
 
-  PngWriter pw{"test.png", cam.GetWidthInPx(), cam.GetHeightInPx()};
+  PngWriter pw{cfg_general.out_file_name.c_str(),
+               cfg_general.pic_width_in_pixel, cfg_general.pic_height_in_pixel};
   if (!pw.IsOk()) {
     throw std::runtime_error("Unable to save png file");
   }

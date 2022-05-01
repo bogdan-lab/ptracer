@@ -1,0 +1,117 @@
+{
+    "general":{
+        "max_bounce_number":1000,
+        "number_of_samples_per_pixel":400,
+        "pic_width_in_pixel":600,
+        "pic_height_in_pixel":400,
+        "output_file":"simple_scene.png"
+    },
+    "camera":{
+        "distance_to_screen":500,
+        "screen_top_left_coordinate":[0, 0, 0],
+        "screen_top_right_coordinate":[600, 0, 0],
+        "screen_bot_left_coordinate":[0, 400, 0]
+    },
+    "objects":[
+        {
+            "type":"sphere",
+            "color":"blue",
+            "polishness":0.1,
+            "reflection":1.0,
+            "is_light_source":false,
+            "radius":80,
+            "center":[300, 320, 200]
+        },
+        {
+            "type":"sphere",
+            "color":"nocolor",
+            "polishness":1.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "radius":80,
+            "center":[132, 320, 200]
+        },
+        {
+            "type":"sphere",
+            "color":"purple",
+            "polishness":0.0,
+            "reflection":0.75,
+            "is_light_source":false,
+            "radius":80,
+            "center":[468, 320, 200]
+        },
+        {
+            "type":"triangles",
+            "color":"red",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "points":[
+                [0, 400, 0], [0, 0, 400], [0, 0, 0],
+                [0, 400, 400]
+            ],
+            "faces":[[0, 1, 2],[0,3,1]]
+        },
+        {
+            "type":"triangles",
+            "color":"green",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "points":[
+                [600, 400, 0], [600, 0, 0], [600, 0, 400], 
+                [600, 400, 400]
+            ],
+            "faces":[[0, 1, 2], [0, 2, 3]]
+        },
+        {
+            "type":"triangles",
+            "color":"grey",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "points":[
+                [0, 400, 0], [600, 400, 0], [0, 400, 400],
+                [600, 400, 400]
+            ],
+            "faces":[[0, 1, 2], [1, 3, 2]]
+        },
+        {
+            "type":"triangles",
+            "color":"white",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":true,
+            "points":[
+                [600, 0, 0], [0, 0, 0], [0, 0, 400],
+                [600, 0, 400]
+            ],
+            "faces":[[0, 1, 2], [0, 2, 3]]
+        },
+        {
+            "type":"triangles",
+            "color":"cayan",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "points":[
+                [0, 400, 400], [600, 0, 400], [0, 0, 400],
+                [600, 400, 400]
+            ],
+            "faces":[[0, 1, 2], [0, 3, 1]]
+        },
+        {
+            "type":"triangles",
+            "color":"nocolor",
+            "polishness":1.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "points":[
+                [0, 400, 0], [0, 0, 0], [600, 0, 0],
+                [600, 400, 0]
+            ],
+            "faces":[[0, 1, 2], [0, 2, 3]]
+        }
+    ]
+}
+

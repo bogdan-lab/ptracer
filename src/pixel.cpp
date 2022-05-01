@@ -1,17 +1,17 @@
 ﻿#include "Pixel.h"
 
-Color pixel::RenderRay(const Ray& ray, const Scene& universe,
+Color pixel::RenderRay(const Ray& ray,
+                       const std::vector<const Object*>& universe,
                        size_t bounce_limit) {
   if (bounce_limit == 0) return colors::kBlack;
   std::vector<Color> bounce_colors;
   bounce_colors.reserve(bounce_limit);
   Ray curr_ray = ray;
-  const auto& all_objects = universe.GetObjects();
   BounceRecord bc_rec;
   for (size_t curr_bnc = 0; curr_bnc < bounce_limit - 1; curr_bnc++) {
     // should take into account all trace ONLY if eventually it hits light
     // source! so check that last hit separately
-    bc_rec = MakeRayBounce(curr_ray, all_objects);
+    bc_rec = MakeRayBounce(curr_ray, universe);
     switch (bc_rec.hit_obj_mat_) {
       case Material::kNoMaterial:
         return Camera::GetEmptyColor();
@@ -26,7 +26,7 @@ Color pixel::RenderRay(const Ray& ray, const Scene& universe,
         throw std::logic_error("Met unknown material in RenderRay()");
     }
   }
-  bc_rec = MakeRayBounce(curr_ray, all_objects);
+  bc_rec = MakeRayBounce(curr_ray, universe);
   if (bc_rec.hit_obj_mat_ != Material::kLightSource) {
     return Camera::GetEmptyColor();
   }
@@ -35,8 +35,8 @@ Color pixel::RenderRay(const Ray& ray, const Scene& universe,
   return Color::GetAverageColor(bounce_colors);
 }
 
-BounceRecord pixel::MakeRayBounce(Ray& ray,
-                                  const ObjectCollection& all_objects) {
+BounceRecord pixel::MakeRayBounce(
+    Ray& ray, const std::vector<const Object*>& all_objects) {
   std::optional<double> dist = std::nullopt;
   size_t obj_idx = 0;
   double min_dist = std::numeric_limits<double>::max();
@@ -52,7 +52,7 @@ BounceRecord pixel::MakeRayBounce(Ray& ray,
     // hit nothing
     return {Material::kNoMaterial, colors::kNoColor};
   }
-  const auto& hit_obj = all_objects[obj_idx];
+  const Object* hit_obj = all_objects[obj_idx];
   switch (hit_obj->GetMaterial()) {
     case Material::kLightSource:
       break;
