@@ -36,9 +36,9 @@ void PngWriter::SaveVectorToImage(const std::vector<Color> &vec) {
   size_t px_num = img_height_ * img_width_;
   size_t r_idx = 0;
   for (size_t i = 0; i < px_num; i++) {
-    row[r_idx++] = vec[i].red_;
-    row[r_idx++] = vec[i].green_;
-    row[r_idx++] = vec[i].blue_;
+    row[r_idx++] = vec[i].red;
+    row[r_idx++] = vec[i].green;
+    row[r_idx++] = vec[i].blue;
     if (!((i + 1) % img_width_)) {
       r_idx = 0;
       png_write_row(png_struct_, row);

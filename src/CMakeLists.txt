@@ -3,6 +3,9 @@
             pixel.cpp
             config.cpp
             PngWriter.cpp
+            color.cpp
+            reflector.cpp
+            matrix.cpp
             )
 
 target_include_directories(ptracer PUBLIC ${NLOHMANN_JSON_PATH}/include)

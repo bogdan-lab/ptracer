@@ -17,11 +17,11 @@ enum class ColorValidity : uint8_t { kYes, kNo };
  * Color can have empty state which is marked by is_color_ field.
  */
 struct Color {
-  uint8_t red_ = 0;
-  uint8_t green_ = 0;
-  uint8_t blue_ = 0;
+  uint8_t red = 0;
+  uint8_t green = 0;
+  uint8_t blue = 0;
   /** Can have only values 1 - valid color is stored, 0 - color is empty*/
-  ColorValidity is_color_ = ColorValidity::kNo;
+  ColorValidity is_color = ColorValidity::kNo;
 
   /**
    * By default empty color is created
@@ -29,22 +29,7 @@ struct Color {
   constexpr Color() = default;
 
   /** Method calculates average color based on given collection of colors.*/
-  static Color GetAverageColor(const std::vector<Color>& colors) {
-    int64_t r = 0;
-    int64_t g = 0;
-    int64_t b = 0;
-    int64_t col_num = 0;
-    for (const auto& el : colors) {
-      if (el.IsColor()) {
-        r += el.red_;
-        g += el.green_;
-        b += el.blue_;
-        col_num++;
-      }
-    }
-    if (!col_num) return Color{0, 0, 0};
-    return {r / col_num, g / col_num, b / col_num};
-  }
+  static Color GetAverageColor(const std::vector<Color>& colors);
   /**
    * Light we see is reflection of the light from source.
    * if in light in source red == 0 there could be no red in reflection!
@@ -53,23 +38,16 @@ struct Color {
    * colors starting from the end to the beginning
    * Procedure should be preformed inside one ray trace
    */
-  static void TruncColorsInTrace(std::vector<Color>& colors) {
-    if (colors.empty()) return;
-    auto it_source = colors.rbegin();
-    for (auto it = std::next(it_source); it != colors.rend();
-         ++it, ++it_source) {
-      it->TruncByColor(*it_source);
-    }
-  }
+  static void TruncColorsInTrace(std::vector<Color>& colors);
   /**
    * Creates color based on RGB arguments.
    * passed arguments are clamped from 0 to 255 during creation
    */
   constexpr Color(int64_t R, int64_t G, int64_t B)
-      : is_color_(ColorValidity::kYes) {
-    red_ = ColorClamp(R);
-    green_ = ColorClamp(G);
-    blue_ = ColorClamp(B);
+      : is_color(ColorValidity::kYes) {
+    red = ColorClamp(R);
+    green = ColorClamp(G);
+    blue = ColorClamp(B);
   }
 
   /**
@@ -87,17 +65,16 @@ struct Color {
    */
   constexpr void TruncByColor(const Color& tr_col) {
     if (!IsColor()) return;
-    if (red_ > tr_col.red_) red_ = tr_col.red_;
-    if (green_ > tr_col.green_) green_ = tr_col.green_;
-    if (blue_ > tr_col.blue_) blue_ = tr_col.blue_;
+    if (red > tr_col.red) red = tr_col.red;
+    if (green > tr_col.green) green = tr_col.green;
+    if (blue > tr_col.blue) blue = tr_col.blue;
   }
   /** Checks if current color is empty*/
-  constexpr bool IsColor() const { return is_color_ == ColorValidity::kYes; }
+  constexpr bool IsColor() const { return is_color == ColorValidity::kYes; }
 };
 
 inline constexpr bool operator==(const Color& lhs, const Color& rhs) {
-  return lhs.red_ == rhs.red_ && lhs.blue_ == rhs.blue_ &&
-         lhs.green_ == rhs.green_;
+  return lhs.red == rhs.red && lhs.blue == rhs.blue && lhs.green == rhs.green;
 }
 
 inline constexpr bool operator!=(const Color& lhs, const Color& rhs) {

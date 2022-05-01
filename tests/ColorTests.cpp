@@ -31,8 +31,8 @@ TEST(ColorTests, Truncation) {
     Color tr{100, 100, 100};
     Color g{23, 4, 51};
     g.TruncByColor(tr);
-    EXPECT_EQ(g.red_, 23);
-    EXPECT_EQ(g.green_, 4);
-    EXPECT_EQ(g.blue_, 51);
+    EXPECT_EQ(g.red, 23);
+    EXPECT_EQ(g.green, 4);
+    EXPECT_EQ(g.blue, 51);
   }
 }
