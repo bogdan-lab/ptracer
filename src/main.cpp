@@ -3,13 +3,11 @@
 #include <utility>
 #include <vector>
 
-#include "Camera.h"
 #include "GeoVec.h"
 #include "Objects.h"
 #include "Pixel.h"
 #include "PngWriter.h"
 #include "Ray.h"
-#include "Scene.h"
 
 int main() {
   Config cfg("simple_scene.json");

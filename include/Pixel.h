@@ -5,12 +5,10 @@
 #include <random>
 #include <vector>
 
-#include "Camera.h"
 #include "Color.h"
 #include "Config.h"
 #include "Objects.h"
 #include "Ray.h"
-#include "Scene.h"
 
 /** Struct contains information about material and color of an object which was
  * hit by ray*/

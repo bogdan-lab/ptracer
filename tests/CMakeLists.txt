@@ -5,7 +5,6 @@ add_executable(unit_tests
     ColorTests.cpp
     RayTests.cpp
     ObjTests.cpp
-    CameraTests.cpp
     MatrixTests.cpp
     ConfigTests.cpp
     PixelTests.cpp

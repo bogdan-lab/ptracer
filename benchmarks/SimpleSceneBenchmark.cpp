@@ -1,13 +1,11 @@
 ﻿#include <memory>
 
 #include "BenchmarkBase.h"
-#include "Camera.h"
 #include "Color.h"
 #include "GeoVec.h"
 #include "Objects.h"
 #include "Pixel.h"
 #include "PngWriter.h"
-#include "Scene.h"
 #include "benchmark_info.h"
 
 class SimpleSceneBenchmark : public BenchmarkBase {

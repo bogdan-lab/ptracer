@@ -14,7 +14,7 @@ Color pixel::RenderRay(const Ray& ray,
     bc_rec = MakeRayBounce(curr_ray, universe);
     switch (bc_rec.hit_obj_mat_) {
       case Material::kNoMaterial:
-        return Camera::GetEmptyColor();
+        return colors::kBlack;
       case Material::kLightSource:
         bounce_colors.push_back(bc_rec.hit_obj_color_);
         Color::TruncColorsInTrace(bounce_colors);
@@ -28,7 +28,7 @@ Color pixel::RenderRay(const Ray& ray,
   }
   bc_rec = MakeRayBounce(curr_ray, universe);
   if (bc_rec.hit_obj_mat_ != Material::kLightSource) {
-    return Camera::GetEmptyColor();
+    return colors::kBlack;
   }
   bounce_colors.push_back(bc_rec.hit_obj_color_);
   Color::TruncColorsInTrace(bounce_colors);
