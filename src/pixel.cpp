@@ -97,3 +97,11 @@ std::vector<pixel::Tile> pixel::CreateTiles(const GeoVec& top_left_point,
   }
   return result;
 }
+
+GeoVec pixel::CreateViewerPoint(const CameraSettings& cs) {
+  GeoVec w_vec{cs.screen_top_left_coor, cs.screen_top_right_coor};
+  GeoVec h_vec{cs.screen_top_left_coor, cs.screen_bot_left_coor};
+  GeoVec norm = h_vec.Cross(w_vec).Norm();
+  GeoVec mid_point = 0.5 * (cs.screen_top_right_coor + cs.screen_bot_left_coor);
+  return mid_point + norm * cs.distance_to_screen;
+}

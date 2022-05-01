@@ -7,6 +7,7 @@
 
 #include "Camera.h"
 #include "Color.h"
+#include "Config.h"
 #include "Objects.h"
 #include "Ray.h"
 #include "Scene.h"
@@ -24,13 +25,14 @@ struct Tile {
   GeoVec width_vec;
   GeoVec height_vec;
 };
+/**Creates point from which all screen rays will be emitted.*/
+GeoVec CreateViewerPoint(const CameraSettings& cs);
 /**
  * Creates collecciton of rays pointing from the ray_start to a random point
  * in the tile
  */
 std::vector<Ray> CreateRays(const Tile& tile, const GeoVec& ray_start,
                             std::mt19937& rnd, int ray_num);
-
 /**
  * Creates tiles for the given plane. Note that tiles are listed frol left to
  * right, from up to bottom

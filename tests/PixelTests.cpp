@@ -84,3 +84,14 @@ TEST(PixelTests, CreateTiles) {
   EXPECT_EQ(tiles[7].width_vec, expected_width_vec);
   EXPECT_EQ(tiles[7].height_vec, expected_height_vec);
 }
+
+TEST(PixelTests, CreateViewerPoint) {
+  CameraSettings set;
+  set.screen_top_left_coor = GeoVec{-5.0, 3.0, 5.0};
+  set.screen_top_right_coor = GeoVec{5.0, 3.0, 5.0};
+  set.screen_bot_left_coor = GeoVec{-5.0, 3.0, -2.0};
+  set.distance_to_screen = 10.0;
+  GeoVec res = pixel::CreateViewerPoint(set);
+  GeoVec expected{0.0, -7.0, 1.5};
+  EXPECT_EQ(res, expected);
+}

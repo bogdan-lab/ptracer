@@ -83,8 +83,7 @@ inline constexpr GeoVec operator-(const GeoVec& v) {
 }
 /** @return distance between two given points*/
 inline double dist_btw_points(const GeoVec& lhs, const GeoVec& rhs) {
-  GeoVec tmp{lhs, rhs};
-  return tmp.Len();
+  return GeoVec{lhs, rhs}.Len();
 }
 
 #endif  // GEO_VEC_H
