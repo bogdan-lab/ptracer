@@ -278,7 +278,7 @@ TEST(ConfigTest, ParsingObjectOption3) {
   std::string file_name = "test_config.json";
   nlohmann::json cfg;
   cfg["objects"] = {
-      {{"color", "green"},
+      {{"color", "nocolor"},
        {"polishness", 150.0},
        {"reflection", 0.2},
        {"is_light_source", false},
@@ -296,7 +296,7 @@ TEST(ConfigTest, ParsingObjectOption3) {
   {
     const auto* tri = dynamic_cast<const Triangle*>(res[0]);
     ASSERT_THAT(tri, NotNull());
-    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetColor(), colors::kNoColor);
     EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
     EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
     EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
@@ -307,7 +307,7 @@ TEST(ConfigTest, ParsingObjectOption3) {
   {
     const auto* tri = dynamic_cast<const Triangle*>(res[1]);
     ASSERT_THAT(tri, NotNull());
-    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetColor(), colors::kNoColor);
     EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
     EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
     EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
@@ -318,7 +318,7 @@ TEST(ConfigTest, ParsingObjectOption3) {
   {
     const auto* tri = dynamic_cast<const Triangle*>(res[2]);
     ASSERT_THAT(tri, NotNull());
-    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetColor(), colors::kNoColor);
     EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
     EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
     EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);
@@ -329,7 +329,7 @@ TEST(ConfigTest, ParsingObjectOption3) {
   {
     const auto* tri = dynamic_cast<const Triangle*>(res[3]);
     ASSERT_THAT(tri, NotNull());
-    EXPECT_EQ(tri->GetColor(), colors::kGreen);
+    EXPECT_EQ(tri->GetColor(), colors::kNoColor);
     EXPECT_EQ(tri->GetMaterial(), Material::kReflective);
     EXPECT_DOUBLE_EQ(tri->GetPolishness(), 1.0);
     EXPECT_DOUBLE_EQ(tri->GetReflectionCoefficient(), 0.2);

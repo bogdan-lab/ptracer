@@ -131,15 +131,15 @@ namespace {
 
 std::optional<Color> StringToColor(std::string_view str) {
   static std::vector<std::string> names{
-      "BLACK", "WHITE",     "RED",    "GREEN",      "BLUE",
-      "GREY",  "ORANGE",    "YELLOW", "LIGHTGREEN", "PALEGREEN",
-      "CAYAN", "LIGHTBLUE", "VIOLET", "PURPLE"};
+      "NOCOLOR",   "BLACK", "WHITE",     "RED",    "GREEN",
+      "BLUE",      "GREY",  "ORANGE",    "YELLOW", "LIGHTGREEN",
+      "PALEGREEN", "CAYAN", "LIGHTBLUE", "VIOLET", "PURPLE"};
   static std::vector<Color> colors{
-      colors::kBlack,     colors::kWhite,  colors::kRed,
-      colors::kGreen,     colors::kBlue,   colors::kGrey,
-      colors::kOrange,    colors::kYellow, colors::kLightGreen,
-      colors::kPaleGreen, colors::kCayan,  colors::kLightBlue,
-      colors::kViolet,    colors::kPurple};
+      colors::kNoColor,    colors::kBlack,     colors::kWhite,
+      colors::kRed,        colors::kGreen,     colors::kBlue,
+      colors::kGrey,       colors::kOrange,    colors::kYellow,
+      colors::kLightGreen, colors::kPaleGreen, colors::kCayan,
+      colors::kLightBlue,  colors::kViolet,    colors::kPurple};
   std::string upper(str);
   std::transform(
       upper.begin(), upper.end(), upper.begin(),
