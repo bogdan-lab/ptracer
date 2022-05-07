@@ -187,7 +187,9 @@ class Triangle : public Object {
     double den = ray_dir.Dot(norm_);
     if (den >= 0) return std::nullopt;  // ray is directed away!
     double t = -(D_ + ray_pos.Dot(norm_)) / den;
-    if (!CheckInTriangle(ray_pos + t * ray_dir)) return std::nullopt;
+    // t<0 - means that the ray_pos is situated from the wrong side to the
+    // triangle
+    if (t <= 0 || !CheckInTriangle(ray_pos + t * ray_dir)) return std::nullopt;
     return t;
   }
 
