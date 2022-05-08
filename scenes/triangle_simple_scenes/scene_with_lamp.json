@@ -1,0 +1,59 @@
+{
+    "general":{
+        "max_bounce_number":2000,
+        "number_of_samples_per_pixel":1000,
+        "pic_width_in_pixel":600,
+        "pic_height_in_pixel":400,
+        "output_file":"with_lamp.png"
+    },
+    "camera":{
+        "distance_to_screen":50,
+        "screen_top_left_coordinate":[20, -50, 50],
+        "screen_top_right_coordinate":[20, 50, 50],
+        "screen_bot_left_coordinate":[20, -50, 0]
+    },
+    "objects":[
+        {
+            "type":"triangles",
+            "color":"grey",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "description":"bounding_box.json"
+        },
+        {
+            "type":"triangles",
+            "color":"red",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "description":"cyllinder.json"
+        },
+        {
+            "type":"triangles",
+            "color":"green",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "description":"cone.json"
+        },
+        {
+            "type":"triangles",
+            "color":"white",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":true,
+            "description":"box_lamp.json"
+        },
+        {
+            "type":"sphere",
+            "color":"blue",
+            "polishness":0.0,
+            "reflection":1.0,
+            "is_light_source":false,
+            "radius":10.0,
+            "center":[0, 20, 30]
+        }
+    ]
+}
+
